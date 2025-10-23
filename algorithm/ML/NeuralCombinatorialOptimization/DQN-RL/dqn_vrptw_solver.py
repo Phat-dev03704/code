@@ -26,15 +26,17 @@ class DQNVRPTWSolver:
         state_dim = 9
         action_dim = 101
         
+        # IMPORTANT: Must match the hidden_dim used during training!
+        # Check train.py main() function for the correct value
         self.agent = DQNAgent(
             state_dim=state_dim,
             action_dim=action_dim,
-            hidden_dim=256,
+            hidden_dim=512,  # Match training hyperparameters (was 256, now 512)
             device=device
         )
         
-        # Load trained weights
-        checkpoint = torch.load(model_path, map_location=device)
+        # Load trained weights (set weights_only=False for compatibility with older PyTorch versions)
+        checkpoint = torch.load(model_path, map_location=device, weights_only=False)
         self.agent.policy_net.load_state_dict(checkpoint['policy_net_state_dict'])
         self.agent.policy_net.eval()
         self.agent.epsilon = 0.0  # No exploration during evaluation
