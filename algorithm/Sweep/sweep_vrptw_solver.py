@@ -11,6 +11,8 @@ import time
 from pathlib import Path
 import matplotlib.pyplot as plt
 import math
+import argparse
+import sys
 
 
 class SweepVRPTWSolver:
@@ -638,5 +640,84 @@ def main():
     print("="*80)
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Sweep Algorithm VRPTW Solver',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Cơ bản
+  python sweep_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Tùy chỉnh capacity và số xe
+  python sweep_vrptw_solver.py ../../dataset/R1/R101.csv --capacity 250 --max-vehicles 30
+  
+  # Tùy chỉnh góc quét khởi đầu
+  python sweep_vrptw_solver.py ../../dataset/RC1/RC101.csv --start-angle 90
+  
+  # Không lưu kết quả
+  python sweep_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+        """
+    )
+    
+    parser.add_argument('dataset_path', type=str,
+                        help='Đường dẫn file dataset (.csv)')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--start-angle', type=float, default=0,
+                        help='Góc khởi đầu quét (độ, mặc định: 0)')
+    
+    parser.add_argument('--no-save', action='store_true',
+                        help='Không lưu kết quả')
+    
+    return parser.parse_args()
+
+
+def main_cli():
+    """Main CLI function"""
+    args = parse_arguments()
+    
+    print("="*80)
+    print("SWEEP ALGORITHM - VRPTW SOLVER")
+    print("="*80)
+    print(f"Dataset: {Path(args.dataset_path).stem}")
+    print("🔄 Polar Angle-based Heuristic")
+    print("="*80)
+    
+    solver = SweepVRPTWSolver(
+        dataset_path=args.dataset_path,
+        vehicle_capacity=args.capacity,
+        max_vehicles=args.max_vehicles
+    )
+    
+    print(f"\nStart Angle: {args.start_angle}°")
+    print()
+    
+    result = solver.solve(start_angle=args.start_angle)
+    
+    if result:
+        if not args.no_save:
+            solver.visualize_solution(save=True)
+            solver.save_solution(solve_time=result['time'], status=result['status'])
+        
+        print(f"\n{'='*80}")
+        print("KẾT QUẢ:")
+        print(f"- Số xe: {len(solver.solution)}")
+        print(f"- Tổng quãng đường: {sum([r['distance'] for r in solver.solution.values()]):.2f} km")
+        print(f"- Thời gian: {result['time']:.2f}s")
+        print(f"{'='*80}")
+    else:
+        print("\n❌ Không thể tạo solution!")
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main_cli()
+    else:
+        main()

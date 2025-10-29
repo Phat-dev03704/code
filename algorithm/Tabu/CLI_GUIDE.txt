@@ -1,0 +1,78 @@
+===============================================================================
+           TABU SEARCH - VRPTW SOLVER - CLI GUIDE
+===============================================================================
+
+[1] Chạy 1 dataset (tabu_vrptw_solver.py):
+-------------------------------------------------------------------------------
+# Cơ bản
+python tabu_vrptw_solver.py ../../dataset/C1/C101.csv
+
+# Tùy chỉnh Tabu List size
+python tabu_vrptw_solver.py ../../dataset/R1/R101.csv --tabu-tenure 20
+
+# Tùy chỉnh số iterations và giới hạn không cải thiện
+python tabu_vrptw_solver.py ../../dataset/RC1/RC101.csv --max-iter 2000 --no-improve-limit 200
+
+# Không lưu kết quả
+python tabu_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+
+
+[2] Test nhiều datasets (test_all_datasets.py):
+-------------------------------------------------------------------------------
+# Test tất cả 56 datasets
+python test_all_datasets.py
+
+# Test category C1 (9 datasets)
+python test_all_datasets.py --category C1
+
+# Test 3 datasets đầu tiên
+python test_all_datasets.py --limit 3
+
+# Test R1 với Tabu parameters tùy chỉnh
+python test_all_datasets.py --category R1 --tabu-tenure 20 --max-iter 2000
+
+
+[3] Parameters:
+-------------------------------------------------------------------------------
+--capacity INT           : Sức chứa xe (mặc định: 200)
+--max-vehicles INT       : Số xe tối đa (mặc định: 25)
+
+Tabu Search Parameters:
+--tabu-tenure INT        : Kích thước Tabu List (mặc định: tự động dựa vào dataset)
+                           Số lượng moves bị cấm tạm thời
+                           Càng lớn → ít lặp lại → khám phá rộng hơn
+--max-iter INT           : Số iterations tối đa (mặc định: tự động)
+--no-improve-limit INT   : Dừng nếu không cải thiện sau N iterations (mặc định: tự động)
+--time-limit INT         : Giới hạn thời gian (giây)
+
+--category C1|C2|R1|R2|RC1|RC2  : Chỉ test category này (test_all_datasets.py)
+--limit INT              : Giới hạn số dataset test (test_all_datasets.py)
+--no-save                : Không lưu kết quả (tabu_vrptw_solver.py)
+
+
+[4] Tabu Search - Ưu/Nhược điểm:
+-------------------------------------------------------------------------------
+✅ Ưu điểm:
+  - Tránh lặp lại giải pháp đã thăm nhờ Tabu List (short-term memory)
+  - Có thể thoát khỏi local optima
+  - Hiệu quả cao với neighborhood structure tốt
+  - Kết quả ổn định, ít phụ thuộc random
+
+❌ Nhược điểm:
+  - Cần điều chỉnh tabu_tenure (độ dài Tabu List)
+  - Memory overhead để lưu Tabu List
+  - Thời gian chạy có thể lâu với dataset lớn
+  - Hiệu suất phụ thuộc nhiều vào initial solution
+
+
+[5] Kết quả:
+-------------------------------------------------------------------------------
+result/
+├── images/            # Hình ảnh routes
+│   └── [dataset]_tabu_solution.png
+└── text/              # Kết quả text
+    └── [dataset]_tabu_solution.txt
+
+result/test_summary.csv   # Tổng hợp kết quả test (nếu chạy test_all_datasets.py)
+
+===============================================================================

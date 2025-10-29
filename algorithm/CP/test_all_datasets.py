@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 import time
 import pandas as pd
+import argparse
 import matplotlib
 matplotlib.use('Agg')  # Sử dụng backend không hiển thị GUI
 import matplotlib.pyplot as plt
@@ -204,5 +205,142 @@ def test_all_datasets():
     print(f"  📝 Chi tiết: text/ ({success_count} files)")
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Test CP solver với nhiều datasets',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Test tất cả datasets
+  python test_all_datasets.py
+  
+  # Test chỉ category C1
+  python test_all_datasets.py --category C1
+  
+  # Test với giới hạn
+  python test_all_datasets.py --limit 5
+  
+  # Tùy chỉnh thời gian
+  python test_all_datasets.py --category C1 --time-limit 120
+        """
+    )
+    
+    parser.add_argument('--category', '-c', nargs='+',
+                        choices=['C1', 'C2', 'R1', 'R2', 'RC1', 'RC2'],
+                        help='Chỉ test các category cụ thể')
+    
+    parser.add_argument('--limit', '-l', type=int,
+                        help='Giới hạn số lượng datasets')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--time-limit', type=int, default=60,
+                        help='Giới hạn thời gian mỗi dataset (mặc định: 60s)')
+    
+    return parser.parse_args()
+
+
+def test_with_params(categories_filter=None, limit=None, capacity=200, max_vehicles=25, time_limit=60):
+    """Test với các tham số tùy chỉnh"""
+    
+    from cp_vrptw_solver import CPVRPTWSolver
+    
+    current_dir = Path(__file__).parent
+    code_dir = current_dir.parent.parent
+    dataset_base = code_dir / "dataset"
+    
+    all_categories = {
+        'C1': ['C101', 'C102', 'C103', 'C104', 'C105', 'C106', 'C107', 'C108', 'C109'],
+        'C2': ['C201', 'C202', 'C203', 'C204', 'C205', 'C206', 'C207', 'C208'],
+        'R1': ['R101', 'R102', 'R103', 'R104', 'R105', 'R106', 'R107', 'R108', 'R109', 'R110', 'R111', 'R112'],
+        'R2': ['R201', 'R202', 'R203', 'R204', 'R205', 'R206', 'R207', 'R208', 'R209', 'R210', 'R211'],
+        'RC1': ['RC101', 'RC102', 'RC103', 'RC104', 'RC105', 'RC106', 'RC107', 'RC108'],
+        'RC2': ['RC201', 'RC202', 'RC203', 'RC204', 'RC205', 'RC206', 'RC207', 'RC208']
+    }
+    
+    categories = {k: v for k, v in all_categories.items() if not categories_filter or k in categories_filter}
+    
+    print("="*100)
+    print("TEST CONSTRAINT PROGRAMMING SOLVER")
+    print("="*100)
+    print(f"Categories: {list(categories.keys())}")
+    if limit:
+        print(f"Giới hạn: {limit} datasets")
+    print(f"Thời gian giới hạn/dataset: {time_limit}s")
+    print("="*100 + "\n")
+    
+    result_dir = current_dir / 'result'
+    result_dir.mkdir(exist_ok=True)
+    
+    results = []
+    count = 0
+    
+    for category, files in categories.items():
+        print(f"\n{'#'*100}")
+        print(f"CATEGORY: {category}")
+        print(f"{'#'*100}")
+        
+        for dataset_name in files:
+            if limit and count >= limit:
+                break
+                
+            dataset_path = dataset_base / category / f"{dataset_name}.csv"
+            if not dataset_path.exists():
+                continue
+            
+            count += 1
+            print(f"\n[{count}] {dataset_name}...", end=" ")
+            
+            try:
+                solver = CPVRPTWSolver(str(dataset_path), capacity, max_vehicles)
+                solver.build_model()
+                result = solver.solve(time_limit=time_limit)
+                
+                if result:
+                    solver.visualize_solution(save=True)
+                    solver.save_solution(solve_time=result['time'], status=result['status'])
+                    
+                    num_vehicles = len(solver.solution)
+                    total_distance = sum([r['distance'] for r in solver.solution.values()])
+                    
+                    results.append({
+                        'Dataset': dataset_name,
+                        'Category': category,
+                        'Vehicles': num_vehicles,
+                        'Distance': round(total_distance, 2),
+                        'Time': round(result['time'], 2),
+                        'Status': 'Success'
+                    })
+                    print(f"✓ {num_vehicles} xe, {total_distance:.2f} km")
+                else:
+                    results.append({'Dataset': dataset_name, 'Status': 'Failed'})
+                    print("❌")
+            except Exception as e:
+                results.append({'Dataset': dataset_name, 'Status': f'Error: {str(e)}'})
+                print(f"❌ {str(e)}")
+        
+        if limit and count >= limit:
+            break
+    
+    # Lưu tổng kết
+    df = pd.DataFrame(results)
+    df.to_csv(result_dir / 'test_summary.csv', index=False, encoding='utf-8-sig')
+    
+    success = len([r for r in results if r['Status'] == 'Success'])
+    print(f"\n{'='*100}")
+    print(f"KẾT QUẢ: {success}/{len(results)} thành công")
+    print(f"{'='*100}")
+
+
 if __name__ == "__main__":
-    test_all_datasets()
+    args = parse_arguments()
+    
+    if args.category or args.limit:
+        test_with_params(args.category, args.limit, args.capacity, args.max_vehicles, args.time_limit)
+    else:
+        test_all_datasets()

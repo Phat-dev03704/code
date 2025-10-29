@@ -1,0 +1,45 @@
+═══════════════════════════════════════════════════════════
+   HƯỚNG DẪN - POINTER NETWORK VRPTW SOLVER (Seq2Seq)
+═══════════════════════════════════════════════════════════
+
+POINTER NETWORK: Sử dụng Sequence-to-Sequence với Attention
+để output sequence các điểm cần thăm.
+
+[1] TRAINING MODEL (Bước đầu tiên - BẮT BUỘC)
+-----------------------------------------------------------
+python train.py
+
+Tham số training:
+  --n-epochs N         Số epochs (mặc định: 100)
+  --batch-size N       Batch size (mặc định: 128)
+  --lr RATE           Learning rate (mặc định: 0.001)
+  --hidden-dim N      Hidden dimension (mặc định: 128)
+
+Thời gian: 3-6 giờ (tùy GPU)
+Kết quả: models/pointer_network_best.pth
+
+[2] GIẢI MỘT DATASET
+-----------------------------------------------------------
+python pointer_network_vrptw_solver.py
+
+(File này chưa có CLI parameters, sử dụng default settings)
+
+[3] TEST TẤT CẢ DATASETS
+-----------------------------------------------------------
+python test_all_datasets.py
+
+Kết quả: result/test_summary.csv, result/test_report.txt
+
+[4] ƯU NHƯỢC ĐIỂM
+-----------------------------------------------------------
+✓ Seq2Seq architecture phù hợp với routing
+✓ Attention mechanism hiệu quả
+✓ Inference rất nhanh
+✗ Cần training data nhiều
+✗ Training lâu (3-6 giờ)
+✗ Khó handle time windows
+
+KẾT QUẢ: result/images/, result/text/, result/test_summary.csv
+MODEL: models/pointer_network_best.pth
+
+📖 Xem thêm: README.md, TRAINING_GUIDE.md

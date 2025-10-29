@@ -1,0 +1,78 @@
+===============================================================================
+        SIMULATED ANNEALING - VRPTW SOLVER - CLI GUIDE
+===============================================================================
+
+[1] Chạy 1 dataset (sa_vrptw_solver.py):
+-------------------------------------------------------------------------------
+# Cơ bản
+python sa_vrptw_solver.py ../../dataset/C1/C101.csv
+
+# Tùy chỉnh nhiệt độ
+python sa_vrptw_solver.py ../../dataset/R1/R101.csv --initial-temp 1000 --cooling-rate 0.95
+
+# Tùy chỉnh số iterations
+python sa_vrptw_solver.py ../../dataset/RC1/RC101.csv --max-iter 2000
+
+# Không lưu kết quả
+python sa_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+
+
+[2] Test nhiều datasets (test_all_datasets.py):
+-------------------------------------------------------------------------------
+# Test tất cả 56 datasets
+python test_all_datasets.py
+
+# Test category C1 (9 datasets)
+python test_all_datasets.py --category C1
+
+# Test 3 datasets đầu tiên
+python test_all_datasets.py --limit 3
+
+# Test C1 với SA parameters tùy chỉnh
+python test_all_datasets.py --category C1 --initial-temp 1000 --cooling-rate 0.95
+
+
+[3] Parameters:
+-------------------------------------------------------------------------------
+--capacity INT           : Sức chứa xe (mặc định: 200)
+--max-vehicles INT       : Số xe tối đa (mặc định: 25)
+
+Simulated Annealing Parameters:
+--initial-temp FLOAT     : Nhiệt độ ban đầu (mặc định: tự động dựa vào dataset)
+--final-temp FLOAT       : Nhiệt độ cuối (mặc định: 0.1)
+--cooling-rate FLOAT     : Tỷ lệ làm lạnh (0.9-0.99, mặc định: 0.95)
+                           Càng cao → làm lạnh càng chậm → tìm kiếm kỹ hơn
+--max-iter INT           : Số iterations tối đa (mặc định: tự động)
+--time-limit INT         : Giới hạn thời gian (giây)
+
+--category C1|C2|R1|R2|RC1|RC2  : Chỉ test category này (test_all_datasets.py)
+--limit INT              : Giới hạn số dataset test (test_all_datasets.py)
+--no-save                : Không lưu kết quả (sa_vrptw_solver.py)
+
+
+[4] Simulated Annealing - Ưu/Nhược điểm:
+-------------------------------------------------------------------------------
+✅ Ưu điểm:
+  - Tránh được local optima bằng cách chấp nhận giải pháp tệ hơn với xác suất
+  - Xác suất chấp nhận giảm dần theo nhiệt độ → hội tụ dần
+  - Đơn giản, dễ implement
+  - Phù hợp với bài toán có nhiều local optima
+
+❌ Nhược điểm:
+  - Cần điều chỉnh nhiều hyperparameters (initial_temp, cooling_rate)
+  - Thời gian chạy có thể lâu với cooling_rate cao
+  - Hiệu suất phụ thuộc nhiều vào schedule làm lạnh
+  - Không đảm bảo tìm được global optimum
+
+
+[5] Kết quả:
+-------------------------------------------------------------------------------
+result/
+├── images/            # Hình ảnh routes
+│   └── [dataset]_routes.png
+└── text/              # Kết quả text
+    └── [dataset]_solution.txt
+
+result/test_summary.csv   # Tổng hợp kết quả test (nếu chạy test_all_datasets.py)
+
+===============================================================================

@@ -1,0 +1,61 @@
+═══════════════════════════════════════════════════════════
+   HƯỚNG DẪN GIAO DIỆN DÒNG LỆNH - MILP (Mixed Integer Linear Programming)
+═══════════════════════════════════════════════════════════
+
+⚠️  LƯU Ý: MILP chỉ hiệu quả với datasets nhỏ (<30 khách hàng)
+           Với datasets lớn, nên dùng Heuristic/Metaheuristic
+
+[1] MILP_VRPTW_SOLVER.PY - Giải một dataset
+-----------------------------------------------------------
+Cú pháp:
+  python milp_vrptw_solver.py <dataset_path> [options]
+
+Ví dụ:
+  # Cơ bản (giới hạn 25 khách hàng đầu tiên)
+  python milp_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Tùy chỉnh số khách hàng (khuyến nghị <30)
+  python milp_vrptw_solver.py ../../dataset/R1/R101.csv --max-customers 20
+  
+  # Tùy chỉnh thời gian giải
+  python milp_vrptw_solver.py ../../dataset/RC1/RC101.csv --time-limit 600
+  
+  # Không lưu kết quả
+  python milp_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+
+[2] TEST_ALL_DATASETS.PY - Test nhiều datasets
+-----------------------------------------------------------
+Cú pháp:
+  python test_all_datasets.py [options]
+
+Ví dụ:
+  # Test tất cả datasets (25 khách hàng/dataset)
+  python test_all_datasets.py
+  
+  # Test chỉ category C1
+  python test_all_datasets.py --category C1
+  
+  # Test 5 datasets đầu
+  python test_all_datasets.py --limit 5
+  
+  # Tùy chỉnh số khách hàng và thời gian
+  python test_all_datasets.py --category C1 --max-customers 20 --time-limit 600
+
+[3] THAM SỐ CHI TIẾT
+-----------------------------------------------------------
+--max-customers N    Số khách hàng tối đa (mặc định: 25, khuyến nghị <30)
+--time-limit T       Giới hạn thời gian giải MILP (giây, mặc định: 300)
+--capacity N         Sức chứa xe (mặc định: 200)
+--max-vehicles N     Số xe tối đa (mặc định: 25)
+--category C1 C2     Chỉ test các category cụ thể
+--limit N            Giới hạn số lượng datasets
+--no-save            Không lưu kết quả
+
+[4] ƯU NHƯỢC ĐIỂM
+-----------------------------------------------------------
+✓ Ưu điểm:    Tìm solution tối ưu chính xác (optimal)
+✓ Ưu điểm:    Đảm bảo toán học chặt chẽ
+✗ Nhược điểm: Chỉ hiệu quả với datasets nhỏ (<30 khách hàng)
+✗ Nhược điểm: Thời gian tính toán tăng cấp số nhân
+
+KẾT QUẢ: result/images/, result/text/, result/test_summary.csv

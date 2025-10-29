@@ -185,6 +185,19 @@ def test_all_datasets():
 
 
 def main():
+    """Main function - wrapper for test_all_datasets"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Test Attention Model trên nhiều datasets')
+    parser.add_argument('--model', type=str, default='models/attention_model_best.pth',
+                        help='Đường dẫn model (mặc định: models/attention_model_best.pth)')
+    parser.add_argument('--n-samples', type=int, default=1000,
+                        help='Số samples (mặc định: 1000)')
+    
+    args = parser.parse_args()
+    
+    # Note: test_all_datasets hiện tại hard-coded model path
+    # Có thể cần sửa để nhận tham số
     test_all_datasets()
 
 

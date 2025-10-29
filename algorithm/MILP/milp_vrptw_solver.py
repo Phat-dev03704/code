@@ -11,6 +11,8 @@ from pulp import *
 import time
 from pathlib import Path
 import matplotlib.pyplot as plt
+import argparse
+import sys
 
 
 class MILPVRPTWSolver:
@@ -777,5 +779,96 @@ def main():
     print("="*80)
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='MILP VRPTW Solver (Mixed Integer Linear Programming)',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Cơ bản (giới hạn 25 khách hàng đầu tiên)
+  python milp_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Tùy chỉnh số khách hàng (MILP chỉ hiệu quả với <30)
+  python milp_vrptw_solver.py ../../dataset/R1/R101.csv --max-customers 20
+  
+  # Tùy chỉnh thời gian giải
+  python milp_vrptw_solver.py ../../dataset/RC1/RC101.csv --time-limit 600
+  
+  # Không lưu kết quả
+  python milp_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+
+Lưu ý: MILP chỉ hiệu quả với datasets nhỏ (<30 khách hàng).
+        Với datasets lớn, nên dùng Heuristic/Metaheuristic.
+        """
+    )
+    
+    parser.add_argument('dataset_path', type=str,
+                        help='Đường dẫn file dataset (.csv)')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--max-customers', type=int, default=25,
+                        help='Số khách hàng tối đa (mặc định: 25, khuyến nghị <30)')
+    
+    parser.add_argument('--time-limit', type=int, default=300,
+                        help='Giới hạn thời gian giải MILP (giây, mặc định: 300)')
+    
+    parser.add_argument('--no-save', action='store_true',
+                        help='Không lưu kết quả')
+    
+    return parser.parse_args()
+
+
+def main_cli():
+    """Main CLI function"""
+    args = parse_arguments()
+    
+    print("="*80)
+    print("MILP VRPTW SOLVER (Mixed Integer Linear Programming)")
+    print("="*80)
+    print(f"Dataset: {Path(args.dataset_path).stem}")
+    print(f"⚠️  MILP chỉ hiệu quả với <30 khách hàng")
+    print(f"Max customers: {args.max_customers}")
+    print(f"Time limit: {args.time_limit}s")
+    print("="*80)
+    
+    solver = MILPVRPTWSolver(
+        dataset_path=args.dataset_path,
+        vehicle_capacity=args.capacity,
+        max_vehicles=args.max_vehicles,
+        max_customers=args.max_customers
+    )
+    
+    result = solver.solve(time_limit=args.time_limit)
+    
+    if result and result['status'] == 'Optimal':
+        if not args.no_save:
+            solver.visualize_solution(save=True)
+            solver.save_solution(
+                solve_time=result['time'],
+                status=result['status']
+            )
+        
+        print(f"\n{'='*80}")
+        print("KẾT QUẢ:")
+        print(f"- Số xe: {len(solver.solution)}")
+        print(f"- Tổng quãng đường: {sum([r['distance'] for r in solver.solution.values()]):.2f} km")
+        print(f"- Thời gian giải: {result['time']:.2f}s")
+        print(f"- Trạng thái: {result['status']}")
+        print(f"{'='*80}")
+    else:
+        print("\n❌ Không thể tìm solution tối ưu!")
+        if result:
+            print(f"Trạng thái: {result.get('status', 'Unknown')}")
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main_cli()
+    else:
+        main()

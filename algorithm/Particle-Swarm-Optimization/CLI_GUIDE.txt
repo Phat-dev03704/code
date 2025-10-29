@@ -1,0 +1,89 @@
+═══════════════════════════════════════════════════════════
+   HƯỚNG DẪN GIAO DIỆN DÒNG LỆNH - PARTICLE SWARM OPTIMIZATION
+═══════════════════════════════════════════════════════════
+
+PARTICLE SWARM OPTIMIZATION (PSO): Thuật toán metaheuristic mô phỏng
+hành vi tối ưu của bầy đàn (swarm intelligence). Particles di chuyển
+trong không gian tìm kiếm dựa trên vận tốc và thông tin cá nhân/toàn cục.
+
+[1] PSO_VRPTW_SOLVER.PY - Giải một dataset
+-----------------------------------------------------------
+Cú pháp:
+  python pso_vrptw_solver.py <dataset_path> [options]
+
+Ví dụ:
+  # Cơ bản
+  python pso_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Tùy chỉnh tham số PSO
+  python pso_vrptw_solver.py ../../dataset/R1/R101.csv --n-particles 50 --max-iter 200
+  
+  # Tùy chỉnh hệ số PSO
+  python pso_vrptw_solver.py ../../dataset/RC1/RC101.csv --w 0.7 --c1 1.5 --c2 1.5
+  
+  # Không lưu kết quả
+  python pso_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+
+[2] TEST_ALL_DATASETS.PY - Test nhiều datasets
+-----------------------------------------------------------
+Cú pháp:
+  python test_all_datasets.py [options]
+
+Ví dụ:
+  # Test tất cả datasets
+  python test_all_datasets.py
+  
+  # Test chỉ category C1
+  python test_all_datasets.py --category C1
+  
+  # Test 5 datasets đầu
+  python test_all_datasets.py --limit 5
+  
+  # Tùy chỉnh tham số PSO
+  python test_all_datasets.py --category R1 --n-particles 50 --max-iter 200
+
+[3] THAM SỐ CHI TIẾT
+-----------------------------------------------------------
+--n-particles N      Số particles trong swarm (mặc định: tự động)
+--max-iter N         Số iterations tối đa (mặc định: tự động)
+--w FLOAT           Inertia weight (mặc định: 0.7)
+--c1 FLOAT          Cognitive coefficient (mặc định: 1.5)
+--c2 FLOAT          Social coefficient (mặc định: 1.5)
+--time-limit T       Giới hạn thời gian giây
+--capacity N         Sức chứa xe (mặc định: 200)
+--max-vehicles N     Số xe tối đa (mặc định: 25)
+--category C1 C2     Chỉ test các category cụ thể
+--limit N            Giới hạn số lượng datasets
+--no-save            Không lưu kết quả
+
+[4] GIẢI THÍCH HỆ SỐ PSO
+-----------------------------------------------------------
+w (Inertia Weight):   Trọng số quán tính
+                      • Cao (0.9): Khám phá rộng (exploration)
+                      • Thấp (0.4): Khai thác sâu (exploitation)
+                      • Khuyến nghị: 0.7
+
+c1 (Cognitive):       Hệ số nhận thức cá nhân
+                      • Cao: Particles tin vào kinh nghiệm bản thân
+                      • Khuyến nghị: 1.5
+
+c2 (Social):          Hệ số xã hội toàn cục
+                      • Cao: Particles theo best của swarm
+                      • Khuyến nghị: 1.5
+
+[5] ƯU NHƯỢC ĐIỂM
+-----------------------------------------------------------
+✓ Swarm intelligence - mô phỏng tự nhiên
+✓ Đơn giản, dễ implement
+✓ Ít tham số cần điều chỉnh
+✓ Tốt cho continuous optimization
+✓ Tránh local optima tốt
+
+✗ Cần nhiều particles (chậm)
+✗ Khó áp dụng cho discrete problems như VRP
+✗ Hiệu suất phụ thuộc nhiều vào tham số
+✗ Có thể converge sớm
+
+KẾT QUẢ: result/images/, result/text/, result/test_summary.csv
+
+🐦 PSO phù hợp cho: Bài toán cần explore rộng, tránh local optima

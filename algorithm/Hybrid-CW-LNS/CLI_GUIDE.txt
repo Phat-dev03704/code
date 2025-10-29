@@ -1,0 +1,62 @@
+═══════════════════════════════════════════════════════════
+   HƯỚNG DẪN GIAO DIỆN DÒNG LỆNH - HYBRID CW-LNS (Simplified)
+═══════════════════════════════════════════════════════════
+
+[1] SIMPLIFIED_HYBRID_VRPTW_SOLVER.PY - Giải một dataset
+-----------------------------------------------------------
+Cú pháp:
+  python simplified_hybrid_vrptw_solver.py <dataset_path> [options]
+
+Ví dụ:
+  # Chạy với mode balanced (khuyến nghị ⭐)
+  python simplified_hybrid_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Chạy với mode nhanh
+  python simplified_hybrid_vrptw_solver.py ../../dataset/R1/R101.csv --mode fast
+  
+  # Chỉ dùng Clarke-Wright (không cải thiện)
+  python simplified_hybrid_vrptw_solver.py ../../dataset/RC1/RC101.csv --mode cw_only
+  
+  # So sánh tất cả các modes
+  python simplified_hybrid_vrptw_solver.py ../../dataset/C1/C101.csv --compare
+  
+  # Không lưu kết quả
+  python simplified_hybrid_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+
+[2] TEST_ALL_DATASETS.PY - Test nhiều datasets
+-----------------------------------------------------------
+Cú pháp:
+  python test_all_datasets.py [options]
+
+Ví dụ:
+  # Test tất cả với mode balanced
+  python test_all_datasets.py
+  
+  # Test với mode nhanh
+  python test_all_datasets.py --mode fast
+  
+  # Test chỉ category C1
+  python test_all_datasets.py --category C1
+  
+  # Test 5 datasets đầu
+  python test_all_datasets.py --limit 5
+  
+  # So sánh các modes
+  python test_all_datasets.py --compare
+
+[3] CHẾ ĐỘ (MODES)
+-----------------------------------------------------------
+--mode cw_only        Chỉ Clarke-Wright (< 1s, chất lượng cơ bản)
+--mode fast           Cải thiện nhanh (10-15s, cân bằng tốt)
+--mode balanced       Cân bằng tối ưu (20-25s) ⭐ KHUYẾN NGHỊ
+--mode quality        Chất lượng cao (40-50s, tốt nhất)
+
+[4] THAM SỐ KHÁC
+-----------------------------------------------------------
+--compare            So sánh tất cả các modes
+--category C1 C2     Chỉ test các category cụ thể
+--limit N            Giới hạn số lượng datasets
+--no-save            Không lưu kết quả
+--verbose            Hiển thị chi tiết
+
+KẾT QUẢ: result/images/, result/text/, result/test_summary_<mode>.csv

@@ -1,0 +1,47 @@
+==================================================================================
+                 HƯỚNG DẪN CLI - ANT COLONY OPTIMIZATION
+==================================================================================
+
+� 1. GIẢI 1 DATASET (aco_vrptw_solver.py)
+----------------------------------------------------------------------------------
+Cú pháp:  python aco_vrptw_solver.py <file_dataset> [options]
+
+Ví dụ:
+  python aco_vrptw_solver.py ../../dataset/C1/C101.csv                   # Tự động
+  python aco_vrptw_solver.py ../../dataset/C1/C101.csv --no-save         # Không lưu
+  python aco_vrptw_solver.py ../../dataset/C1/C101.csv --n-ants 40       # 40 kiến
+  python aco_vrptw_solver.py ../../dataset/C1/C101.csv --max-iter 200    # 200 vòng
+
+Tham số quan trọng:
+  --n-ants <số>      Số kiến (mặc định: tự động 20-40)
+  --max-iter <số>    Số vòng lặp (mặc định: 100-200)
+  --alpha <số>       Ảnh hưởng pheromone (mặc định: 1.0)
+  --beta <số>        Ảnh hưởng heuristic (mặc định: 3.0)
+  --time-limit <s>   Giới hạn thời gian (mặc định: 60s)
+  --no-save          Không lưu kết quả
+
+
+📌 2. TEST NHIỀU DATASETS (test_all_datasets.py)
+----------------------------------------------------------------------------------
+Cú pháp:  python test_all_datasets.py [options]
+
+Ví dụ:
+  python test_all_datasets.py                          # Test tất cả
+  python test_all_datasets.py --category C1            # Chỉ C1
+  python test_all_datasets.py --category C1 R1         # C1 và R1
+  python test_all_datasets.py --limit 5                # Test 5 datasets đầu
+  python test_all_datasets.py -c C1 -l 3               # C1, giới hạn 3
+
+Tham số:
+  --category, -c     Chọn category (C1, C2, R1, R2, RC1, RC2)
+  --limit, -l        Giới hạn số datasets
+  --time-limit       Giới hạn thời gian/dataset (mặc định: 60s)
+  --no-save          Không lưu kết quả
+
+
+📂 KẾT QUẢ:
+  result/images/           ← Hình ảnh (.png)
+  result/text/             ← Báo cáo (.txt)
+  result/test_summary.csv  ← Tổng kết
+
+==================================================================================

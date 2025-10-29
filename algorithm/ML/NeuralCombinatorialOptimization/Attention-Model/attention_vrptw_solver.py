@@ -10,6 +10,8 @@ import time
 from pathlib import Path
 import matplotlib.pyplot as plt
 from copy import deepcopy
+import argparse
+import sys
 
 from attention_model import AttentionModelVRPTW
 
@@ -573,5 +575,93 @@ def main():
         print("✓ Hoàn thành!")
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Attention Model VRPTW Solver (Deep RL)',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Cơ bản (sử dụng model đã train)
+  python attention_vrptw_solver.py ../../../../dataset/C1/C101.csv
+  
+  # Chỉ định model cụ thể
+  python attention_vrptw_solver.py ../../../../dataset/R1/R101.csv --model models/attention_model_best.pth
+  
+  # Tùy chỉnh sampling
+  python attention_vrptw_solver.py ../../../../dataset/RC1/RC101.csv --n-samples 1000
+  
+  # Không lưu kết quả
+  python attention_vrptw_solver.py ../../../../dataset/C1/C101.csv --no-save
+
+Lưu ý: Model phải được train trước. Chạy train.py nếu chưa có model.
+        """
+    )
+    
+    parser.add_argument('dataset_path', type=str,
+                        help='Đường dẫn file dataset (.csv)')
+    
+    parser.add_argument('--model', type=str, default='models/attention_model_best.pth',
+                        help='Đường dẫn model đã train (mặc định: models/attention_model_best.pth)')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--n-samples', type=int, default=1000,
+                        help='Số samples để sinh solution (mặc định: 1000)')
+    
+    parser.add_argument('--no-save', action='store_true',
+                        help='Không lưu kết quả')
+    
+    return parser.parse_args()
+
+
+def main_cli():
+    """Main CLI function"""
+    args = parse_arguments()
+    
+    print("="*80)
+    print("ATTENTION MODEL VRPTW SOLVER (Deep RL)")
+    print("="*80)
+    print(f"Dataset: {Path(args.dataset_path).stem}")
+    print(f"Model: {args.model}")
+    print(f"Samples: {args.n_samples}")
+    print("="*80)
+    
+    solver = AttentionModelVRPTWSolver(
+        dataset_path=args.dataset_path,
+        vehicle_capacity=args.capacity,
+        max_vehicles=args.max_vehicles,
+        model_path=args.model
+    )
+    
+    result = solver.solve(n_samples=args.n_samples)
+    
+    if result:
+        if not args.no_save:
+            solver.visualize_solution(save=True)
+            solver.save_solution(
+                solve_time=result['time'],
+                status=result['status'],
+                n_samples=result['n_samples']
+            )
+        
+        print(f"\n{'='*80}")
+        print("KẾT QUẢ:")
+        print(f"- Số xe: {len(solver.solution)}")
+        print(f"- Tổng quãng đường: {sum([r['distance'] for r in solver.solution.values()]):.2f} km")
+        print(f"- Thời gian: {result['time']:.2f}s")
+        print(f"- Samples: {result['n_samples']}")
+        print(f"{'='*80}")
+    else:
+        print("\n❌ Không thể tạo solution!")
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main_cli()
+    else:
+        main()

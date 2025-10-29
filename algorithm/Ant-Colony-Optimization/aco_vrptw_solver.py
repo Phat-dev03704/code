@@ -13,6 +13,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import random
 from copy import deepcopy
+import argparse
+import sys
 
 
 class AntColonyVRPTWSolver:
@@ -855,12 +857,90 @@ class AntColonyVRPTWSolver:
         print(f"✓ Đã lưu báo cáo: {output_path}")
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Giải VRPTW bằng Ant Colony Optimization',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Giải với tham số tự động
+  python aco_vrptw_solver.py ../../dataset/C1/C101.csv
+
+  # Tùy chỉnh tham số
+  python aco_vrptw_solver.py ../../dataset/C1/C101.csv --n-ants 30 --max-iter 150
+
+  # Thay đổi sức chứa xe và số xe
+  python aco_vrptw_solver.py ../../dataset/R1/R101.csv --capacity 250 --max-vehicles 30
+
+  # Không lưu file, chỉ hiển thị kết quả
+  python aco_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+
+  # Xem hướng dẫn siêu tham số
+  python aco_vrptw_solver.py --help-hyperparams
+        """
+    )
+    
+    parser.add_argument('dataset_path', type=str, nargs='?',
+                        help='Đường dẫn đến file CSV dataset')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa của xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--n-ants', type=int,
+                        help='Số lượng kiến (mặc định: tự động theo kích thước)')
+    
+    parser.add_argument('--max-iter', type=int,
+                        help='Số vòng lặp tối đa (mặc định: tự động)')
+    
+    parser.add_argument('--alpha', type=float, default=1.0,
+                        help='Ảnh hưởng pheromone (mặc định: 1.0)')
+    
+    parser.add_argument('--beta', type=float, default=3.0,
+                        help='Ảnh hưởng heuristic (mặc định: 3.0)')
+    
+    parser.add_argument('--rho', type=float, default=0.2,
+                        help='Tốc độ bay hơi pheromone (mặc định: 0.2)')
+    
+    parser.add_argument('--time-limit', type=int, default=60,
+                        help='Giới hạn thời gian giây (mặc định: 60)')
+    
+    parser.add_argument('--no-local-search', action='store_true',
+                        help='Tắt 2-opt local search')
+    
+    parser.add_argument('--no-save', action='store_true',
+                        help='Không lưu kết quả và hình ảnh')
+    
+    parser.add_argument('--help-hyperparams', action='store_true',
+                        help='Hiển thị hướng dẫn điều chỉnh siêu tham số')
+    
+    return parser.parse_args()
+
+
 def main():
     """Hàm chính"""
+    args = parse_arguments()
     
-    current_dir = Path(__file__).parent
-    code_dir = current_dir.parent.parent
-    dataset_path = code_dir / "dataset" / "C1" / "C101.csv"
+    # Nếu chỉ muốn xem hướng dẫn
+    if args.help_hyperparams:
+        solver = AntColonyVRPTWSolver("dummy.csv", 200, 25)
+        solver.print_hyperparameter_guide()
+        return
+    
+    # Kiểm tra dataset path
+    if not args.dataset_path:
+        print("❌ Lỗi: Cần chỉ định đường dẫn dataset")
+        print("Sử dụng: python aco_vrptw_solver.py <dataset_path>")
+        print("Hoặc: python aco_vrptw_solver.py --help")
+        sys.exit(1)
+    
+    dataset_path = Path(args.dataset_path)
+    if not dataset_path.exists():
+        print(f"❌ Lỗi: File không tồn tại: {args.dataset_path}")
+        sys.exit(1)
     
     print("="*80)
     print("ANT COLONY OPTIMIZATION FOR VRPTW")
@@ -871,29 +951,54 @@ def main():
     print("✓ Chất lượng xuất sắc, balance exploration/exploitation")
     print("="*80)
     
-    solver = AntColonyVRPTWSolver(
-        dataset_path=str(dataset_path),
-        vehicle_capacity=200,
-        max_vehicles=25
-    )
-    
-    # Lấy tham số tự động
-    hyperparams = solver.get_recommended_hyperparameters()
-    
-    result = solver.solve(**hyperparams)
-    
-    if result:
-        print("\n" + "="*80)
-        print("TẠO TRỰC QUAN HÓA VÀ BÁO CÁO")
-        print("="*80)
-        solver.visualize_solution(save=True)
-        solver.save_solution(
-            solve_time=result['time'],
-            status=result['status'],
-            iterations=result['iterations'],
-            improvements=result['improvements']
+    try:
+        # Tạo solver
+        solver = AntColonyVRPTWSolver(
+            dataset_path=str(dataset_path),
+            vehicle_capacity=args.capacity,
+            max_vehicles=args.max_vehicles
         )
-        print("✓ Hoàn thành!")
+        
+        # Lấy tham số tự động hoặc dùng tham số từ CLI
+        if args.n_ants or args.max_iter:
+            hyperparams = solver.get_recommended_hyperparameters()
+            if args.n_ants:
+                hyperparams['n_ants'] = args.n_ants
+            if args.max_iter:
+                hyperparams['max_iterations'] = args.max_iter
+        else:
+            hyperparams = solver.get_recommended_hyperparameters()
+        
+        # Cập nhật các tham số từ CLI
+        hyperparams['alpha'] = args.alpha
+        hyperparams['beta'] = args.beta
+        hyperparams['rho'] = args.rho
+        hyperparams['time_limit'] = args.time_limit
+        hyperparams['use_local_search'] = not args.no_local_search
+        
+        # Giải bài toán
+        result = solver.solve(**hyperparams)
+        
+        if result:
+            if not args.no_save:
+                print("\n" + "="*80)
+                print("TẠO TRỰC QUAN HÓA VÀ BÁO CÁO")
+                print("="*80)
+                solver.visualize_solution(save=True)
+                solver.save_solution(
+                    solve_time=result['time'],
+                    status=result['status'],
+                    iterations=result['iterations'],
+                    improvements=result['improvements']
+                )
+            print("✓ Hoàn thành!")
+        else:
+            print("❌ Không tìm được solution")
+            sys.exit(1)
+            
+    except Exception as e:
+        print(f"❌ Lỗi: {str(e)}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

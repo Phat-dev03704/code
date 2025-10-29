@@ -13,6 +13,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
+import argparse
+import sys
 
 
 class ORToolsVRPTWSolver:
@@ -576,5 +578,102 @@ def main():
     print("="*100)
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='OR-Tools VRPTW Solver (Google Optimization Tools)',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Cơ bản
+  python ortools_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Tùy chỉnh thời gian giải
+  python ortools_vrptw_solver.py ../../dataset/R1/R101.csv --time-limit 120
+  
+  # Tùy chỉnh search strategy
+  python ortools_vrptw_solver.py ../../dataset/RC1/RC101.csv --strategy GUIDED_LOCAL_SEARCH
+  
+  # Không lưu kết quả
+  python ortools_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+
+Lưu ý: OR-Tools là solver mạnh mẽ từ Google, thường cho kết quả rất tốt.
+        """
+    )
+    
+    parser.add_argument('dataset_path', type=str,
+                        help='Đường dẫn file dataset (.csv)')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--time-limit', type=int, default=60,
+                        help='Giới hạn thời gian (giây, mặc định: 60)')
+    
+    parser.add_argument('--strategy', type=str, 
+                        default='AUTOMATIC',
+                        choices=['AUTOMATIC', 'PATH_CHEAPEST_ARC', 'GUIDED_LOCAL_SEARCH', 
+                                'SIMULATED_ANNEALING', 'TABU_SEARCH'],
+                        help='Search strategy (mặc định: AUTOMATIC)')
+    
+    parser.add_argument('--no-save', action='store_true',
+                        help='Không lưu kết quả')
+    
+    return parser.parse_args()
+
+
+def main_cli():
+    """Main CLI function"""
+    args = parse_arguments()
+    
+    print("="*100)
+    print("OR-TOOLS VRPTW SOLVER (Google Optimization Tools)")
+    print("="*100)
+    print(f"Dataset: {Path(args.dataset_path).stem}")
+    print(f"Time limit: {args.time_limit}s")
+    print(f"Strategy: {args.strategy}")
+    print("="*100)
+    
+    solver = ORToolsVRPTWSolver(
+        dataset_path=args.dataset_path,
+        vehicle_capacity=args.capacity,
+        max_vehicles=args.max_vehicles
+    )
+    
+    # Map strategy name to OR-Tools enum
+    strategy_map = {
+        'AUTOMATIC': routing_enums_pb2.FirstSolutionStrategy.AUTOMATIC,
+        'PATH_CHEAPEST_ARC': routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC,
+        'GUIDED_LOCAL_SEARCH': routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH,
+        'SIMULATED_ANNEALING': routing_enums_pb2.LocalSearchMetaheuristic.SIMULATED_ANNEALING,
+        'TABU_SEARCH': routing_enums_pb2.LocalSearchMetaheuristic.TABU_SEARCH
+    }
+    
+    result = solver.solve(time_limit_seconds=args.time_limit)
+    
+    if result and result['status'] == 'Success':
+        if not args.no_save:
+            solver.visualize_solution(save=True)
+            solver.save_solution()
+        
+        print(f"\n{'='*100}")
+        print("KẾT QUẢ:")
+        print(f"- Số xe: {len(solver.solution)}")
+        print(f"- Tổng quãng đường: {sum([r['distance'] for r in solver.solution.values()]):.2f} km")
+        print(f"- Thời gian giải: {result['time']:.2f}s")
+        print(f"- Trạng thái: {result['status']}")
+        print(f"{'='*100}")
+    else:
+        print("\n❌ Không thể tìm solution!")
+        if result:
+            print(f"Trạng thái: {result.get('status', 'Unknown')}")
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main_cli()
+    else:
+        main()

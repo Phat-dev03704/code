@@ -13,6 +13,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import random
 from copy import deepcopy
+import argparse
+import sys
 
 
 class GeneticAlgorithmVRPTWSolver:
@@ -971,5 +973,131 @@ def main():
         print("✓ Hoàn thành!")
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Giải VRPTW bằng Genetic Algorithm',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Giải với tham số tự động
+  python ga_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Tùy chỉnh tham số GA
+  python ga_vrptw_solver.py ../../dataset/C1/C101.csv --pop-size 100 --generations 200
+  
+  # Điều chỉnh crossover và mutation
+  python ga_vrptw_solver.py ../../dataset/R1/R101.csv --crossover-rate 0.8 --mutation-rate 0.15
+  
+  # Không lưu file
+  python ga_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+        """
+    )
+    
+    parser.add_argument('dataset_path', type=str, nargs='?',
+                        help='Đường dẫn đến file CSV dataset')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa của xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--pop-size', type=int,
+                        help='Kích thước quần thể (mặc định: tự động)')
+    
+    parser.add_argument('--generations', type=int,
+                        help='Số thế hệ (mặc định: tự động)')
+    
+    parser.add_argument('--crossover-rate', type=float, default=0.8,
+                        help='Tỷ lệ lai ghép (mặc định: 0.8)')
+    
+    parser.add_argument('--mutation-rate', type=float, default=0.1,
+                        help='Tỷ lệ đột biến (mặc định: 0.1)')
+    
+    parser.add_argument('--elite-size', type=int,
+                        help='Số cá thể ưu tú (mặc định: tự động)')
+    
+    parser.add_argument('--time-limit', type=int, default=60,
+                        help='Giới hạn thời gian giây (mặc định: 60)')
+    
+    parser.add_argument('--no-save', action='store_true',
+                        help='Không lưu kết quả và hình ảnh')
+    
+    return parser.parse_args()
+
+
+def main_cli():
+    """Hàm chính với CLI"""
+    args = parse_arguments()
+    
+    if not args.dataset_path:
+        print("❌ Lỗi: Cần chỉ định đường dẫn dataset")
+        print("Sử dụng: python ga_vrptw_solver.py <dataset_path>")
+        sys.exit(1)
+    
+    dataset_path = Path(args.dataset_path)
+    if not dataset_path.exists():
+        print(f"❌ Lỗi: File không tồn tại: {args.dataset_path}")
+        sys.exit(1)
+    
+    print("="*80)
+    print("GENETIC ALGORITHM FOR VRPTW")
+    print("="*80)
+    print("✓ Metaheuristic mô phỏng quá trình tiến hóa")
+    print("✓ Selection, Crossover, Mutation")
+    print("✓ Giải toàn bộ dataset (100+ khách hàng)")
+    print("✓ Chất lượng rất tốt, đa dạng và ổn định")
+    print("="*80)
+    
+    try:
+        solver = GeneticAlgorithmVRPTWSolver(
+            dataset_path=str(dataset_path),
+            vehicle_capacity=args.capacity,
+            max_vehicles=args.max_vehicles
+        )
+        
+        # Lấy tham số tự động hoặc dùng tham số từ CLI
+        hyperparams = solver.get_recommended_hyperparameters()
+        
+        if args.pop_size:
+            hyperparams['population_size'] = args.pop_size
+        if args.generations:
+            hyperparams['max_generations'] = args.generations
+        if args.elite_size:
+            hyperparams['elite_size'] = args.elite_size
+        
+        hyperparams['crossover_rate'] = args.crossover_rate
+        hyperparams['mutation_rate'] = args.mutation_rate
+        hyperparams['time_limit'] = args.time_limit
+        
+        result = solver.solve(**hyperparams)
+        
+        if result:
+            if not args.no_save:
+                print("\n" + "="*80)
+                print("TẠO TRỰC QUAN HÓA VÀ BÁO CÁO")
+                print("="*80)
+                solver.visualize_solution(save=True)
+                solver.save_solution(
+                    solve_time=result['time'],
+                    status=result['status'],
+                    generations=result['generations'],
+                    improvements=result['improvements'],
+                    final_fitness=result.get('final_fitness')
+                )
+            print("✓ Hoàn thành!")
+        else:
+            print("❌ Không tìm được solution")
+            sys.exit(1)
+            
+    except Exception as e:
+        print(f"❌ Lỗi: {str(e)}")
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main_cli()
+    else:
+        main()

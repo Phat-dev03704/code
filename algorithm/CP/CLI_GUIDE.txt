@@ -1,0 +1,45 @@
+==================================================================================
+                  HƯỚNG DẪN CLI - CONSTRAINT PROGRAMMING (CP)
+==================================================================================
+
+📌 1. GIẢI 1 DATASET (cp_vrptw_solver.py)
+----------------------------------------------------------------------------------
+Cú pháp:  python cp_vrptw_solver.py <file_dataset> [options]
+
+Ví dụ:
+  python cp_vrptw_solver.py ../../dataset/C1/C101.csv                 # Cơ bản (60s)
+  python cp_vrptw_solver.py ../../dataset/C1/C101.csv --no-save       # Không lưu
+  python cp_vrptw_solver.py ../../dataset/C1/C101.csv --time-limit 300  # 5 phút
+  python cp_vrptw_solver.py ../../dataset/R1/R101.csv --capacity 250  # Sức chứa 250
+
+Tham số:
+  --time-limit <giây>    Giới hạn thời gian (mặc định: 60s)
+  --capacity <số>        Sức chứa xe (mặc định: 200)
+  --max-vehicles <số>    Số xe tối đa (mặc định: 25)
+  --no-save              Không lưu kết quả
+
+
+📌 2. TEST NHIỀU DATASETS (test_all_datasets.py)
+----------------------------------------------------------------------------------
+Cú pháp:  python test_all_datasets.py [options]
+
+Ví dụ:
+  python test_all_datasets.py                          # Test tất cả
+  python test_all_datasets.py --category C1            # Chỉ C1
+  python test_all_datasets.py --limit 5                # Test 5 datasets
+  python test_all_datasets.py -c C1 --time-limit 120  # C1, mỗi dataset 2 phút
+
+Tham số:
+  --category, -c         Chọn category (C1, C2, R1, R2, RC1, RC2)
+  --limit, -l            Giới hạn số datasets
+  --time-limit           Giới hạn thời gian/dataset (mặc định: 60s)
+  --capacity             Sức chứa xe (mặc định: 200)
+  --max-vehicles         Số xe tối đa (mặc định: 25)
+
+
+📂 KẾT QUẢ:
+  result/images/           ← Hình ảnh (.png)
+  result/text/             ← Báo cáo (.txt)
+  result/test_summary.csv  ← Tổng kết
+
+==================================================================================

@@ -267,30 +267,162 @@ def compare_modes():
         print(f"\n✅ Đã lưu so sánh vào: {comparison_csv}")
 
 
-def main():
-    """Main function"""
+def parse_arguments():
+    """Parse command line arguments"""
     import argparse
     
-    parser = argparse.ArgumentParser(description='Test Simplified Hybrid VRPTW Solver')
-    parser.add_argument('--mode', type=str, default='balanced',
-                       choices=['cw_only', 'fast', 'balanced', 'quality'],
-                       help='Chế độ chạy (default: balanced)')
-    parser.add_argument('--compare', action='store_true',
-                       help='So sánh các modes')
+    parser = argparse.ArgumentParser(
+        description='Test Simplified Hybrid VRPTW Solver với nhiều datasets',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Test tất cả với mode balanced
+  python test_all_datasets.py
+  
+  # Test với mode nhanh
+  python test_all_datasets.py --mode fast
+  
+  # Test chỉ category C1
+  python test_all_datasets.py --category C1
+  
+  # Test 5 datasets đầu
+  python test_all_datasets.py --limit 5
+  
+  # So sánh tất cả các modes
+  python test_all_datasets.py --compare
+        """
+    )
     
-    args = parser.parse_args()
+    parser.add_argument('--mode', '-m', type=str, default='balanced',
+                       choices=['cw_only', 'fast', 'balanced', 'quality'],
+                       help='Chế độ: cw_only, fast, balanced, quality (mặc định: balanced)')
+    
+    parser.add_argument('--category', '-c', nargs='+',
+                        choices=['C1', 'C2', 'R1', 'R2', 'RC1', 'RC2'],
+                        help='Chỉ test các category cụ thể')
+    
+    parser.add_argument('--limit', '-l', type=int,
+                        help='Giới hạn số lượng datasets')
+    
+    parser.add_argument('--compare', action='store_true',
+                       help='So sánh các modes trên 1 dataset')
+    
+    parser.add_argument('--no-save', action='store_true',
+                        help='Không lưu kết quả')
+    
+    return parser.parse_args()
+
+
+def test_with_params(mode='balanced', categories_filter=None, limit=None, save_results=True):
+    """Test với các tham số tùy chỉnh"""
+    print("=" * 100)
+    print(f"TESTING SIMPLIFIED HYBRID VRPTW SOLVER - MODE: {mode.upper()}")
+    print("=" * 100)
+    
+    # Danh sách categories
+    all_categories = {
+        "C1": ["C101", "C102", "C103", "C104", "C105", "C106", "C107", "C108", "C109"],
+        "C2": ["C201", "C202", "C203", "C204", "C205", "C206", "C207", "C208"],
+        "R1": ["R101", "R102", "R103", "R104", "R105", "R106", "R107", "R108", "R109", "R110", "R111", "R112"],
+        "R2": ["R201", "R202", "R203", "R204", "R205", "R206", "R207", "R208", "R209", "R210", "R211"],
+        "RC1": ["RC101", "RC102", "RC103", "RC104", "RC105", "RC106", "RC107", "RC108"],
+        "RC2": ["RC201", "RC202", "RC203", "RC204", "RC205", "RC206", "RC207", "RC208"]
+    }
+    
+    categories = {k: v for k, v in all_categories.items() if not categories_filter or k in categories_filter}
+    
+    if categories_filter:
+        print(f"Categories: {categories_filter}")
+    if limit:
+        print(f"Giới hạn: {limit} datasets")
+    print("=" * 100 + "\n")
+    
+    results = []
+    total_success = 0
+    total_failed = 0
+    count = 0
+    
+    for category_name, datasets in categories.items():
+        print(f"\n{'='*100}")
+        print(f"CATEGORY: {category_name}")
+        print(f"{'='*100}")
+        
+        for dataset_name in datasets:
+            if limit and count >= limit:
+                break
+                
+            dataset_path = DATASET_DIR / category_name / f"{dataset_name}.csv"
+            
+            if not dataset_path.exists():
+                print(f"⚠️  Dataset không tồn tại: {dataset_path}")
+                continue
+            
+            count += 1
+            print(f"\n[{count}] Testing {dataset_name}...", end=" ")
+            
+            try:
+                solver = SimplifiedHybridVRPTWSolver(
+                    dataset_path=str(dataset_path),
+                    mode=mode
+                )
+                
+                solution = solver.solve(verbose=False)
+                
+                if save_results:
+                    solver.visualize_solution(save=True)
+                    solver.save_solution()
+                
+                results.append({
+                    'Dataset': dataset_name,
+                    'Category': category_name,
+                    'Vehicles': solution['num_vehicles'],
+                    'Distance': round(solution['total_distance'], 2),
+                    'Time': round(solver.solve_time, 2),
+                    'Improvement': round(solver.improvement_percentage, 2) if mode != 'cw_only' else 0,
+                    'Status': 'Success'
+                })
+                
+                print(f"✓ {solution['num_vehicles']} xe, {solution['total_distance']:.2f} km, {solver.solve_time:.2f}s")
+                total_success += 1
+                
+            except Exception as e:
+                print(f"❌ Error: {str(e)}")
+                results.append({
+                    'Dataset': dataset_name,
+                    'Category': category_name,
+                    'Status': f'Failed: {str(e)}'
+                })
+                total_failed += 1
+        
+        if limit and count >= limit:
+            break
+    
+    # Lưu kết quả
+    if save_results and results:
+        df = pd.DataFrame(results)
+        summary_file = RESULT_DIR / f'test_summary_{mode}.csv'
+        df.to_csv(summary_file, index=False, encoding='utf-8-sig')
+        print(f"\n✓ Đã lưu kết quả: {summary_file}")
+    
+    print(f"\n{'='*100}")
+    print(f"KẾT QUẢ: {total_success} thành công, {total_failed} thất bại / {len(results)} tổng")
+    print(f"{'='*100}")
+
+
+def main():
+    """Main function"""
+    args = parse_arguments()
     
     if args.compare:
         compare_modes()
     else:
-        test_all_datasets(mode=args.mode)
+        test_with_params(
+            mode=args.mode,
+            categories_filter=args.category,
+            limit=args.limit,
+            save_results=not args.no_save
+        )
 
 
 if __name__ == "__main__":
-    # Test với mode balanced (mặc định)
-    print("Starting tests with BALANCED mode...\n")
-    test_all_datasets(mode='balanced')
-    
-    # Uncomment để so sánh các modes
-    # print("\n\n")
-    # compare_modes()
+    main()

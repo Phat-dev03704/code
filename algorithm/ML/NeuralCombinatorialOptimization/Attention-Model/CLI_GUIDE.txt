@@ -1,0 +1,67 @@
+═══════════════════════════════════════════════════════════
+   HƯỚNG DẪN - ATTENTION MODEL VRPTW SOLVER (Deep RL)
+═══════════════════════════════════════════════════════════
+
+ATTENTION MODEL: Sử dụng Transformer-based Reinforcement Learning
+để học cách giải VRPTW. Model cần được TRAIN trước khi sử dụng.
+
+[1] TRAINING MODEL (Bước đầu tiên - BẮT BUỘC)
+-----------------------------------------------------------
+python train.py
+
+Tham số training (tùy chọn):
+  --n-epochs N         Số epochs (mặc định: 100)
+  --batch-size N       Batch size (mặc định: 64)
+  --lr RATE           Learning rate (mặc định: 0.001)
+  --embedding-dim N    Embedding dimension (mặc định: 128)
+
+Thời gian: 2-4 giờ (tùy GPU)
+Kết quả: models/attention_model_best.pth
+
+[2] GIẢI MỘT DATASET (Sau khi đã train)
+-----------------------------------------------------------
+Cú pháp:
+  python attention_vrptw_solver.py <dataset_path> [options]
+
+Ví dụ:
+  # Cơ bản
+  python attention_vrptw_solver.py ../../../../dataset/C1/C101.csv
+  
+  # Chỉ định model cụ thể
+  python attention_vrptw_solver.py ../../../../dataset/R1/R101.csv --model models/attention_model_best.pth
+  
+  # Tùy chỉnh sampling
+  python attention_vrptw_solver.py ../../../../dataset/RC1/RC101.csv --n-samples 2000
+  
+  # Không lưu kết quả
+  python attention_vrptw_solver.py ../../../../dataset/C1/C101.csv --no-save
+
+[3] TEST TẤT CẢ DATASETS
+-----------------------------------------------------------
+python test_all_datasets.py
+
+Hoặc với tham số:
+python test_all_datasets.py --model models/attention_model_best.pth --n-samples 1000
+
+Kết quả: result/test_summary.csv, result/test_report.txt
+
+[4] THAM SỐ CHI TIẾT
+-----------------------------------------------------------
+--model PATH         Đường dẫn model đã train
+--n-samples N        Số samples để sinh solution (mặc định: 1000)
+--capacity N         Sức chứa xe (mặc định: 200)
+--max-vehicles N     Số xe tối đa (mặc định: 25)
+--no-save            Không lưu kết quả
+
+[5] ƯU NHƯỢC ĐIỂM
+-----------------------------------------------------------
+✓ Inference rất nhanh (< 1s)
+✓ End-to-end learning
+✓ Có thể generalize cho instances mới
+✗ Cần training dài (2-4 giờ)
+✗ Cần GPU để training hiệu quả
+
+KẾT QUẢ: result/images/, result/text/, result/test_summary.csv
+MODEL: models/attention_model_best.pth
+
+📖 Xem thêm: README.md

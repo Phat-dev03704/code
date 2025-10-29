@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 import time
 import pandas as pd
+import argparse
 
 # Add parent directory to path
 current_dir = Path(__file__).parent
@@ -241,5 +242,166 @@ def test_all_datasets():
     print(f"{'='*80}\n")
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Test Simulated Annealing với datasets Solomon',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Test tất cả datasets
+  python test_all_datasets.py
+  
+  # Test category C1
+  python test_all_datasets.py --category C1
+  
+  # Test 3 datasets đầu tiên
+  python test_all_datasets.py --limit 3
+  
+  # Test với SA parameters tùy chỉnh
+  python test_all_datasets.py --category C1 --initial-temp 1000 --cooling-rate 0.95
+        """
+    )
+    
+    parser.add_argument('--category', type=str,
+                        choices=['C1', 'C2', 'R1', 'R2', 'RC1', 'RC2'],
+                        help='Chỉ test category này')
+    
+    parser.add_argument('--limit', type=int,
+                        help='Giới hạn số dataset test')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--initial-temp', type=float,
+                        help='Nhiệt độ ban đầu')
+    
+    parser.add_argument('--final-temp', type=float, default=0.1,
+                        help='Nhiệt độ cuối (mặc định: 0.1)')
+    
+    parser.add_argument('--cooling-rate', type=float, default=0.95,
+                        help='Tỷ lệ làm lạnh (mặc định: 0.95)')
+    
+    parser.add_argument('--max-iter', type=int,
+                        help='Số iterations tối đa')
+    
+    parser.add_argument('--time-limit', type=int,
+                        help='Giới hạn thời gian (giây)')
+    
+    return parser.parse_args()
+
+
+def test_with_params(category_filter=None, limit=None, **kwargs):
+    """Test datasets với tham số tùy chỉnh"""
+    
+    print("="*80)
+    print("🌡️ Phương pháp: Simulated Annealing")
+    print("="*80)
+    
+    sa_params = {}
+    if kwargs.get('initial_temp'):
+        sa_params['initial_temperature'] = kwargs['initial_temp']
+    if kwargs.get('final_temp'):
+        sa_params['final_temperature'] = kwargs['final_temp']
+    if kwargs.get('cooling_rate'):
+        sa_params['cooling_rate'] = kwargs['cooling_rate']
+    if kwargs.get('max_iter'):
+        sa_params['max_iterations'] = kwargs['max_iter']
+    if kwargs.get('time_limit'):
+        sa_params['time_limit'] = kwargs['time_limit']
+    
+    if sa_params:
+        print(f"SA Parameters: {sa_params}")
+        print("="*80)
+    
+    dataset_root = Path(__file__).parent.parent.parent / "dataset"
+    categories = [category_filter] if category_filter else ['C1', 'C2', 'R1', 'R2', 'RC1', 'RC2']
+    
+    all_results = []
+    
+    for category in categories:
+        category_path = dataset_root / category
+        if not category_path.exists():
+            continue
+            
+        dataset_files = sorted(category_path.glob("*.csv"))
+        if limit:
+            dataset_files = dataset_files[:limit]
+        
+        for i, dataset_file in enumerate(dataset_files, 1):
+            print(f"\n{'='*80}")
+            print(f"📦 [{category}] {i}/{len(dataset_files)}: {dataset_file.stem}")
+            print(f"{'='*80}")
+            
+            try:
+                solver = SimulatedAnnealingVRPTWSolver(
+                    dataset_path=str(dataset_file),
+                    vehicle_capacity=kwargs.get('capacity', 200),
+                    max_vehicles=kwargs.get('max_vehicles', 25)
+                )
+                
+                hyperparams = solver.get_recommended_hyperparameters()
+                hyperparams.update(sa_params)
+                
+                result = solver.solve(**hyperparams)
+                
+                if result:
+                    solver.visualize_solution(save=True)
+                    solver.save_solution(
+                        solve_time=result['time'],
+                        status=result['status'],
+                        iterations=result['iterations'],
+                        improvements=result['improvements'],
+                        acceptance_rate=result.get('acceptance_rate')
+                    )
+                    
+                    all_results.append({
+                        'Category': category,
+                        'Dataset': dataset_file.stem,
+                        'Vehicles': len(solver.solution),
+                        'Distance': sum([r['distance'] for r in solver.solution.values()]),
+                        'Time': result['time'],
+                        'Iterations': result['iterations']
+                    })
+                    print(f"✓ Thành công!")
+                else:
+                    print(f"❌ Không tạo được solution")
+                    
+            except Exception as e:
+                print(f"❌ Lỗi: {str(e)}")
+    
+    if all_results:
+        result_dir = Path(__file__).parent / "result"
+        result_dir.mkdir(exist_ok=True)
+        
+        summary_df = pd.DataFrame(all_results)
+        summary_df.to_csv(result_dir / "test_summary.csv", index=False)
+        
+        print(f"\n{'='*80}")
+        print("📊 TỔNG KẾT:")
+        print(f"{'='*80}")
+        for cat in categories:
+            cat_data = summary_df[summary_df['Category'] == cat]
+            if len(cat_data) > 0:
+                print(f"{cat}: Avg Vehicles={cat_data['Vehicles'].mean():.1f}, Avg Distance={cat_data['Distance'].mean():.1f}")
+
+
 if __name__ == "__main__":
-    test_all_datasets()
+    if len(sys.argv) > 1:
+        args = parse_arguments()
+        test_with_params(
+            category_filter=args.category,
+            limit=args.limit,
+            capacity=args.capacity,
+            max_vehicles=args.max_vehicles,
+            initial_temp=args.initial_temp,
+            final_temp=args.final_temp,
+            cooling_rate=args.cooling_rate,
+            max_iter=args.max_iter,
+            time_limit=args.time_limit
+        )
+    else:
+        test_all_datasets()

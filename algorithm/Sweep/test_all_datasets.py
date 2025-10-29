@@ -7,6 +7,7 @@ from pathlib import Path
 import pandas as pd
 import time
 import matplotlib
+import argparse
 matplotlib.use('Agg')  # Sử dụng backend không cần GUI
 
 # Import solver
@@ -199,5 +200,124 @@ def test_all_datasets():
     print("="*100)
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Test Sweep Algorithm với datasets Solomon',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Test tất cả datasets
+  python test_all_datasets.py
+  
+  # Test category C1
+  python test_all_datasets.py --category C1
+  
+  # Test 5 datasets đầu tiên
+  python test_all_datasets.py --limit 5
+  
+  # Test với góc quét tùy chỉnh
+  python test_all_datasets.py --category R1 --start-angle 45
+        """
+    )
+    
+    parser.add_argument('--category', type=str,
+                        choices=['C1', 'C2', 'R1', 'R2', 'RC1', 'RC2'],
+                        help='Chỉ test category này')
+    
+    parser.add_argument('--limit', type=int,
+                        help='Giới hạn số dataset test')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--start-angle', type=float, default=0,
+                        help='Góc khởi đầu quét (độ, mặc định: 0)')
+    
+    return parser.parse_args()
+
+
+def test_with_params(category_filter=None, limit=None, **kwargs):
+    """Test datasets với tham số tùy chỉnh"""
+    
+    print("="*80)
+    print("🔄 Phương pháp: Sweep Algorithm")
+    print("="*80)
+    
+    dataset_root = Path(__file__).parent.parent.parent / "dataset"
+    categories = [category_filter] if category_filter else ['C1', 'C2', 'R1', 'R2', 'RC1', 'RC2']
+    
+    all_results = []
+    
+    for category in categories:
+        category_path = dataset_root / category
+        if not category_path.exists():
+            continue
+            
+        dataset_files = sorted(category_path.glob("*.csv"))
+        if limit:
+            dataset_files = dataset_files[:limit]
+        
+        for i, dataset_file in enumerate(dataset_files, 1):
+            print(f"\n{'='*80}")
+            print(f"📦 [{category}] {i}/{len(dataset_files)}: {dataset_file.stem}")
+            print(f"{'='*80}")
+            
+            try:
+                solver = SweepVRPTWSolver(
+                    dataset_path=str(dataset_file),
+                    vehicle_capacity=kwargs.get('capacity', 200),
+                    max_vehicles=kwargs.get('max_vehicles', 25)
+                )
+                
+                result = solver.solve(start_angle=kwargs.get('start_angle', 0))
+                
+                if result:
+                    solver.visualize_solution(save=True)
+                    solver.save_solution(solve_time=result['time'], status=result['status'])
+                    
+                    all_results.append({
+                        'Category': category,
+                        'Dataset': dataset_file.stem,
+                        'Vehicles': len(solver.solution),
+                        'Distance': sum([r['distance'] for r in solver.solution.values()]),
+                        'Time': result['time']
+                    })
+                    print(f"✓ Thành công!")
+                else:
+                    print(f"❌ Không tạo được solution")
+                    
+            except Exception as e:
+                print(f"❌ Lỗi: {str(e)}")
+    
+    if all_results:
+        result_dir = Path(__file__).parent / "result"
+        result_dir.mkdir(exist_ok=True)
+        
+        summary_df = pd.DataFrame(all_results)
+        summary_df.to_csv(result_dir / "test_summary.csv", index=False)
+        
+        print(f"\n{'='*80}")
+        print("📊 TỔNG KẾT:")
+        print(f"{'='*80}")
+        for cat in categories:
+            cat_data = summary_df[summary_df['Category'] == cat]
+            if len(cat_data) > 0:
+                print(f"{cat}: Avg Vehicles={cat_data['Vehicles'].mean():.1f}, Avg Distance={cat_data['Distance'].mean():.1f}")
+
+
 if __name__ == "__main__":
-    test_all_datasets()
+    if len(sys.argv) > 1:
+        args = parse_arguments()
+        test_with_params(
+            category_filter=args.category,
+            limit=args.limit,
+            capacity=args.capacity,
+            max_vehicles=args.max_vehicles,
+            start_angle=args.start_angle
+        )
+    else:
+        test_all_datasets()

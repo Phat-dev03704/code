@@ -18,6 +18,7 @@ import random
 from copy import deepcopy
 import matplotlib.pyplot as plt
 from datetime import datetime
+import argparse
 
 # Add parent directories to path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -819,8 +820,141 @@ class SimplifiedHybridVRPTWSolver:
         return summary_data
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Simplified Hybrid VRPTW Solver (Clarke-Wright + Improvement)',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Chạy với mode balanced (khuyến nghị)
+  python simplified_hybrid_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Chạy với mode nhanh
+  python simplified_hybrid_vrptw_solver.py ../../dataset/R1/R101.csv --mode fast
+  
+  # Chỉ dùng Clarke-Wright (không cải thiện)
+  python simplified_hybrid_vrptw_solver.py ../../dataset/RC1/RC101.csv --mode cw_only
+  
+  # So sánh tất cả các modes
+  python simplified_hybrid_vrptw_solver.py ../../dataset/C1/C101.csv --compare
+  
+  # Không lưu kết quả
+  python simplified_hybrid_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+        """
+    )
+    
+    parser.add_argument('dataset_path', type=str,
+                        help='Đường dẫn file dataset (.csv)')
+    
+    parser.add_argument('--mode', '-m', type=str, default='balanced',
+                        choices=['cw_only', 'fast', 'balanced', 'quality'],
+                        help='Chế độ: cw_only (< 1s), fast (10-15s), balanced (20-25s), quality (40-50s)')
+    
+    parser.add_argument('--compare', action='store_true',
+                        help='So sánh tất cả các modes')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--no-save', action='store_true',
+                        help='Không lưu kết quả')
+    
+    parser.add_argument('--verbose', '-v', action='store_true',
+                        help='Hiển thị thông tin chi tiết')
+    
+    return parser.parse_args()
+
+
+def main_cli():
+    """Main CLI function"""
+    args = parse_arguments()
+    
+    if args.compare:
+        # So sánh các modes
+        modes = ['cw_only', 'fast', 'balanced', 'quality']
+        print("=" * 100)
+        print(f"SO SÁNH CÁC MODES - Dataset: {Path(args.dataset_path).stem}")
+        print("=" * 100)
+        
+        results = []
+        
+        for mode in modes:
+            print(f"\n{'='*100}")
+            print(f"Testing mode: {mode.upper()}")
+            print(f"{'='*100}")
+            
+            solver = SimplifiedHybridVRPTWSolver(
+                dataset_path=args.dataset_path,
+                mode=mode,
+                vehicle_capacity=args.capacity,
+                max_vehicles=args.max_vehicles
+            )
+            
+            solution = solver.solve(verbose=args.verbose)
+            
+            if not args.no_save:
+                solver.visualize_solution(save=True)
+                solver.save_solution()
+            
+            results.append({
+                'mode': mode,
+                'distance': solution['total_distance'],
+                'vehicles': solution['num_vehicles'],
+                'time': solver.solve_time,
+                'improvement': solver.improvement_percentage if mode != 'cw_only' else 0
+            })
+        
+        # Summary
+        print("\n" + "="*100)
+        print("SUMMARY - COMPARISON OF MODES")
+        print("="*100)
+        print(f"{'Mode':<15} {'Distance':<15} {'Vehicles':<12} {'Time (s)':<12} {'Improvement %':<15}")
+        print("-"*100)
+        for r in results:
+            print(f"{r['mode']:<15} {r['distance']:<15.2f} {r['vehicles']:<12} {r['time']:<12.2f} {r['improvement']:<15.2f}")
+        
+        print("\n" + "="*100)
+        print("RECOMMENDATION:")
+        print("- CW Only: Fastest (< 1s) but basic quality")
+        print("- Fast: Good balance for real-time needs (10-15s)")
+        print("- Balanced: RECOMMENDED - Best overall (20-25s) ⭐")
+        print("- Quality: Best results when time allows (40-50s)")
+        print("="*100)
+    else:
+        # Chạy với 1 mode
+        print("=" * 100)
+        print(f"SIMPLIFIED HYBRID VRPTW SOLVER - Mode: {args.mode.upper()}")
+        print("=" * 100)
+        
+        solver = SimplifiedHybridVRPTWSolver(
+            dataset_path=args.dataset_path,
+            mode=args.mode,
+            vehicle_capacity=args.capacity,
+            max_vehicles=args.max_vehicles
+        )
+        
+        solution = solver.solve(verbose=args.verbose)
+        
+        if not args.no_save:
+            solver.visualize_solution(save=True)
+            solver.save_solution()
+        
+        print(f"\n{'='*100}")
+        print("KẾT QUẢ:")
+        print(f"- Số xe: {solution['num_vehicles']}")
+        print(f"- Tổng quãng đường: {solution['total_distance']:.2f} km")
+        print(f"- Thời gian: {solver.solve_time:.2f}s")
+        if args.mode != 'cw_only':
+            print(f"- Cải thiện: {solver.improvement_percentage:.2f}%")
+        print(f"{'='*100}")
+
+
 def main():
-    """Test simplified hybrid solver"""
+    """Original test function for backward compatibility"""
     dataset_path = r"d:\My Studing\Nghiệp vụ thông minh\project\Vehicle Routing Problem\code\dataset\C1\C101.csv"
     
     modes = ['cw_only', 'fast', 'balanced', 'quality']
@@ -868,4 +1002,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main_cli()
+    else:
+        main()

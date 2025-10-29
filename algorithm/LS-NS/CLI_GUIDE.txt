@@ -1,0 +1,59 @@
+═══════════════════════════════════════════════════════════
+   HƯỚNG DẪN GIAO DIỆN DÒNG LỆNH - LOCAL SEARCH / NEIGHBORHOOD SEARCH
+═══════════════════════════════════════════════════════════
+
+[1] LS_VRPTW_SOLVER.PY - Giải một dataset
+-----------------------------------------------------------
+Cú pháp:
+  python ls_vrptw_solver.py <dataset_path> [options]
+
+Ví dụ:
+  # Cơ bản
+  python ls_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Tùy chỉnh số vòng lặp
+  python ls_vrptw_solver.py ../../dataset/R1/R101.csv --max-iter 200
+  
+  # Tùy chỉnh điều kiện dừng
+  python ls_vrptw_solver.py ../../dataset/RC1/RC101.csv --no-improve-limit 50
+  
+  # Không lưu kết quả
+  python ls_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+
+[2] TEST_ALL_DATASETS.PY - Test nhiều datasets
+-----------------------------------------------------------
+Cú pháp:
+  python test_all_datasets.py [options]
+
+Ví dụ:
+  # Test tất cả datasets
+  python test_all_datasets.py
+  
+  # Test chỉ category C1
+  python test_all_datasets.py --category C1
+  
+  # Test 5 datasets đầu
+  python test_all_datasets.py --limit 5
+  
+  # Tùy chỉnh tham số LS
+  python test_all_datasets.py --category R1 --max-iter 150 --time-limit 120
+
+[3] THAM SỐ CHI TIẾT
+-----------------------------------------------------------
+--max-iter N            Số vòng lặp tối đa (mặc định: tự động)
+--no-improve-limit N    Dừng sau N vòng không cải thiện (mặc định: tự động)
+--time-limit T          Giới hạn thời gian giây (mặc định: không giới hạn)
+--capacity N            Sức chứa xe (mặc định: 200)
+--max-vehicles N        Số xe tối đa (mặc định: 25)
+--category C1 C2        Chỉ test các category cụ thể
+--limit N               Giới hạn số lượng datasets
+--no-save               Không lưu kết quả
+
+[4] PHÉP BIẾN ĐỔI LÂN CẬN
+-----------------------------------------------------------
+2-opt        Đảo ngược đoạn trong route
+Relocate     Di chuyển khách hàng giữa các routes
+Exchange     Hoán đổi khách hàng giữa các routes
+Cross        Hoán đổi chuỗi giữa hai routes
+
+KẾT QUẢ: result/images/, result/text/, result/test_summary.csv

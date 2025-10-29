@@ -9,6 +9,8 @@ import seaborn as sns
 import numpy as np
 from pathlib import Path
 import os
+import argparse
+import sys
 
 # Thiết lập style cho biểu đồ
 sns.set_style("whitegrid")
@@ -673,27 +675,149 @@ class VRPTWVisualizer:
         print(f"{'='*60}\n")
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Trực quan hóa dataset Solomon VRPTW',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Tạo biểu đồ tổng hợp và lưu file
+  python visualize_vrptw.py ../dataset/C1/C101.csv --save
+
+  # Hiển thị biểu đồ không lưu file
+  python visualize_vrptw.py ../dataset/R1/R101.csv
+
+  # Chỉ in thống kê không tạo biểu đồ
+  python visualize_vrptw.py ../dataset/RC1/RC101.csv --stats-only
+
+  # Tạo các biểu đồ riêng lẻ
+  python visualize_vrptw.py ../dataset/C1/C101.csv --save --plot-type locations
+  python visualize_vrptw.py ../dataset/C1/C101.csv --save --plot-type time_windows
+  python visualize_vrptw.py ../dataset/C1/C101.csv --save --plot-type demand
+  python visualize_vrptw.py ../dataset/C1/C101.csv --save --plot-type tw_demand
+  python visualize_vrptw.py ../dataset/C1/C101.csv --save --plot-type heatmaps
+  python visualize_vrptw.py ../dataset/C1/C101.csv --save --plot-type all_individual
+
+  # Tạo báo cáo TXT
+  python visualize_vrptw.py ../dataset/C1/C101.csv --report-only
+        """
+    )
+    
+    parser.add_argument('dataset_path', type=str,
+                        help='Đường dẫn đến file CSV dataset (VD: ../dataset/C1/C101.csv)')
+    
+    parser.add_argument('--save', '-s', action='store_true',
+                        help='Lưu hình ảnh vào thư mục "visualize dataset images"')
+    
+    parser.add_argument('--stats-only', action='store_true',
+                        help='Chỉ in thống kê, không tạo biểu đồ')
+    
+    parser.add_argument('--report-only', action='store_true',
+                        help='Chỉ tạo file báo cáo TXT, không tạo biểu đồ')
+    
+    parser.add_argument('--plot-type', '-p', type=str,
+                        choices=['summary', 'locations', 'time_windows', 'demand', 
+                                'tw_demand', 'heatmaps', 'all_individual'],
+                        default='summary',
+                        help='''Loại biểu đồ cần tạo:
+  summary          - Biểu đồ tổng hợp (mặc định)
+  locations        - Vị trí khách hàng và depot
+  time_windows     - Gantt chart cửa sổ thời gian
+  demand           - Phân phối nhu cầu
+  tw_demand        - Time window width vs Demand
+  heatmaps         - Phân tích không gian-thời gian
+  all_individual   - Tạo tất cả 5 biểu đồ riêng lẻ''')
+    
+    parser.add_argument('--no-display', action='store_true',
+                        help='Không hiển thị biểu đồ (chỉ lưu file khi dùng với --save)')
+    
+    parser.add_argument('--dpi', type=int, default=300,
+                        help='Độ phân giải ảnh khi lưu (mặc định: 300)')
+    
+    return parser.parse_args()
+
+
 def main():
     """Hàm chính để chạy visualization"""
     
-    # Ví dụ sử dụng - Thay đổi đường dẫn phù hợp
-    dataset_path = "../dataset/C1/C101.csv"
+    # Parse arguments
+    args = parse_arguments()
     
-    # Tạo visualizer
-    viz = VRPTWVisualizer(dataset_path)
+    # Kiểm tra file tồn tại
+    if not Path(args.dataset_path).exists():
+        print(f"❌ Lỗi: File không tồn tại: {args.dataset_path}")
+        sys.exit(1)
     
-    # In thống kê
-    viz.print_statistics()
-    
-    # Tạo biểu đồ tổng hợp duy nhất (save=True để lưu ảnh)
-    viz.plot_all(save=True)
-    
-    # Nếu muốn tạo từng biểu đồ riêng lẻ (5 ảnh):
-    # viz.plot_customer_locations(save=True)
-    # viz.plot_time_windows(save=True)
-    # viz.plot_demand_distribution(save=True)
-    # viz.plot_time_window_width(save=True)
-    # viz.plot_spatial_temporal_heatmap(save=True)
+    try:
+        # Tạo visualizer
+        viz = VRPTWVisualizer(args.dataset_path)
+        
+        # In thống kê
+        viz.print_statistics()
+        
+        # Nếu chỉ in thống kê
+        if args.stats_only:
+            return
+        
+        # Nếu chỉ tạo báo cáo TXT
+        if args.report_only:
+            viz.generate_text_report(save=True)
+            print(f"✅ Đã tạo báo cáo TXT cho {viz.dataset_name}")
+            return
+        
+        # Quyết định có lưu file không
+        save_file = args.save or args.no_display
+        
+        # Tạo biểu đồ dựa trên loại được chọn
+        if args.plot_type == 'summary':
+            viz.plot_comprehensive_summary(save=save_file)
+            if save_file:
+                viz.generate_text_report(save=True)
+                print(f"✅ Đã lưu biểu đồ tổng hợp và báo cáo TXT cho {viz.dataset_name}")
+        
+        elif args.plot_type == 'locations':
+            viz.plot_customer_locations(save=save_file)
+            if save_file:
+                print(f"✅ Đã lưu biểu đồ vị trí khách hàng cho {viz.dataset_name}")
+        
+        elif args.plot_type == 'time_windows':
+            viz.plot_time_windows(save=save_file)
+            if save_file:
+                print(f"✅ Đã lưu Gantt chart cửa sổ thời gian cho {viz.dataset_name}")
+        
+        elif args.plot_type == 'demand':
+            viz.plot_demand_distribution(save=save_file)
+            if save_file:
+                print(f"✅ Đã lưu biểu đồ phân phối nhu cầu cho {viz.dataset_name}")
+        
+        elif args.plot_type == 'tw_demand':
+            viz.plot_time_window_width(save=save_file)
+            if save_file:
+                print(f"✅ Đã lưu biểu đồ Time Window vs Demand cho {viz.dataset_name}")
+        
+        elif args.plot_type == 'heatmaps':
+            viz.plot_spatial_temporal_heatmap(save=save_file)
+            if save_file:
+                print(f"✅ Đã lưu heatmaps phân tích không gian-thời gian cho {viz.dataset_name}")
+        
+        elif args.plot_type == 'all_individual':
+            print(f"Đang tạo tất cả 5 biểu đồ riêng lẻ cho {viz.dataset_name}...")
+            viz.plot_customer_locations(save=save_file)
+            viz.plot_time_windows(save=save_file)
+            viz.plot_demand_distribution(save=save_file)
+            viz.plot_time_window_width(save=save_file)
+            viz.plot_spatial_temporal_heatmap(save=save_file)
+            if save_file:
+                print(f"✅ Đã lưu tất cả 5 biểu đồ riêng lẻ cho {viz.dataset_name}")
+        
+        # Nếu no_display được bật, không show
+        if not args.no_display and not save_file:
+            plt.show()
+            
+    except Exception as e:
+        print(f"❌ Lỗi khi xử lý dataset: {str(e)}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

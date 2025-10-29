@@ -10,6 +10,8 @@ import numpy as np
 import time
 from pathlib import Path
 import matplotlib.pyplot as plt
+import argparse
+import sys
 
 
 class ClarkeWrightVRPTWSolver:
@@ -596,5 +598,93 @@ def main():
     print("="*80)
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Giải VRPTW bằng Clarke-Wright Savings Algorithm',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Giải dataset
+  python cw_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Tùy chỉnh sức chứa và số xe
+  python cw_vrptw_solver.py ../../dataset/R1/R101.csv --capacity 250 --max-vehicles 30
+  
+  # Không lưu file
+  python cw_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+        """
+    )
+    
+    parser.add_argument('dataset_path', type=str, nargs='?',
+                        help='Đường dẫn đến file CSV dataset')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa của xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--no-save', action='store_true',
+                        help='Không lưu kết quả và hình ảnh')
+    
+    return parser.parse_args()
+
+
+def main_cli():
+    """Hàm chính với CLI"""
+    args = parse_arguments()
+    
+    if not args.dataset_path:
+        print("❌ Lỗi: Cần chỉ định đường dẫn dataset")
+        print("Sử dụng: python cw_vrptw_solver.py <dataset_path>")
+        sys.exit(1)
+    
+    dataset_path = Path(args.dataset_path)
+    if not dataset_path.exists():
+        print(f"❌ Lỗi: File không tồn tại: {args.dataset_path}")
+        sys.exit(1)
+    
+    print("="*80)
+    print("CLARKE-WRIGHT SAVINGS ALGORITHM FOR VRPTW")
+    print("="*80)
+    print("✓ Thuật toán Heuristic nhanh và hiệu quả")
+    print("✓ Có thể giải toàn bộ dataset (100+ khách hàng)")
+    print("✓ Thời gian giải: Rất nhanh (< 5 giây)")
+    print("✓ Dựa trên ý tưởng: Gộp routes tiết kiệm quãng đường nhất")
+    print("="*80)
+    
+    try:
+        # Tạo solver
+        solver = ClarkeWrightVRPTWSolver(
+            dataset_path=str(dataset_path),
+            vehicle_capacity=args.capacity,
+            max_vehicles=args.max_vehicles
+        )
+        
+        # Giải bài toán
+        result = solver.solve()
+        
+        if result:
+            if not args.no_save:
+                print("\n" + "="*80)
+                print("TẠO TRỰC QUAN HÓA VÀ BÁO CÁO")
+                print("="*80)
+                solver.visualize_solution(save=True)
+                solver.save_solution(solve_time=result['time'], status=result['status'])
+                print("✓ Đã tạo file PNG và TXT trong thư mục 'result/'")
+            print("\n✓ Hoàn thành!")
+        else:
+            print("\n❌ Không thể tạo solution!")
+            sys.exit(1)
+            
+    except Exception as e:
+        print(f"❌ Lỗi: {str(e)}")
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main_cli()
+    else:
+        main()

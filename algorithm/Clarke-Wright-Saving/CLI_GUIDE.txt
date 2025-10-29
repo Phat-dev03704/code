@@ -1,0 +1,43 @@
+==================================================================================
+               HƯỚNG DẪN CLI - CLARKE-WRIGHT SAVINGS ALGORITHM
+==================================================================================
+
+📌 1. GIẢI 1 DATASET (cw_vrptw_solver.py)
+----------------------------------------------------------------------------------
+Cú pháp:  python cw_vrptw_solver.py <file_dataset> [options]
+
+Ví dụ:
+  python cw_vrptw_solver.py ../../dataset/C1/C101.csv                # Cơ bản
+  python cw_vrptw_solver.py ../../dataset/C1/C101.csv --no-save      # Không lưu
+  python cw_vrptw_solver.py ../../dataset/C1/C101.csv --capacity 250 # Sức chứa 250
+
+Tham số:
+  --capacity <số>        Sức chứa xe (mặc định: 200)
+  --max-vehicles <số>    Số xe tối đa (mặc định: 25)
+  --no-save              Không lưu kết quả
+
+
+📌 2. TEST NHIỀU DATASETS (test_all_datasets.py)
+----------------------------------------------------------------------------------
+Cú pháp:  python test_all_datasets.py [options]
+
+Ví dụ:
+  python test_all_datasets.py                          # Test tất cả
+  python test_all_datasets.py --category C1            # Chỉ C1
+  python test_all_datasets.py --category C1 R1         # C1 và R1
+  python test_all_datasets.py --limit 5                # Test 5 datasets
+  python test_all_datasets.py -c C1 -l 3               # C1, giới hạn 3
+
+Tham số:
+  --category, -c     Chọn category (C1, C2, R1, R2, RC1, RC2)
+  --limit, -l        Giới hạn số datasets
+  --capacity         Sức chứa xe (mặc định: 200)
+  --max-vehicles     Số xe tối đa (mặc định: 25)
+
+
+📂 KẾT QUẢ:
+  result/images/           ← Hình ảnh (.png)
+  result/text/             ← Báo cáo (.txt)
+  result/test_summary.csv  ← Tổng kết
+
+==================================================================================

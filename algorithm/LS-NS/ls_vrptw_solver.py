@@ -16,6 +16,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import random
 from copy import deepcopy
+import argparse
+import sys
 
 
 class LocalSearchVRPTWSolver:
@@ -867,5 +869,112 @@ def main():
     print("="*80)
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Local Search / Neighborhood Search VRPTW Solver',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Cơ bản
+  python ls_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Tùy chỉnh số vòng lặp
+  python ls_vrptw_solver.py ../../dataset/R1/R101.csv --max-iter 200
+  
+  # Tùy chỉnh xe
+  python ls_vrptw_solver.py ../../dataset/RC1/RC101.csv --capacity 250 --max-vehicles 30
+  
+  # Không lưu kết quả
+  python ls_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+        """
+    )
+    
+    parser.add_argument('dataset_path', type=str,
+                        help='Đường dẫn file dataset (.csv)')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--max-iter', type=int,
+                        help='Số vòng lặp tối đa (mặc định: tự động)')
+    
+    parser.add_argument('--no-improve-limit', type=int,
+                        help='Dừng sau N vòng không cải thiện (mặc định: tự động)')
+    
+    parser.add_argument('--time-limit', type=int,
+                        help='Giới hạn thời gian (giây)')
+    
+    parser.add_argument('--no-save', action='store_true',
+                        help='Không lưu kết quả')
+    
+    return parser.parse_args()
+
+
+def main_cli():
+    """Main CLI function"""
+    args = parse_arguments()
+    
+    print("="*80)
+    print("LOCAL SEARCH / NEIGHBORHOOD SEARCH - VRPTW SOLVER")
+    print("="*80)
+    print(f"Dataset: {Path(args.dataset_path).stem}")
+    print("Phép biến đổi: 2-opt, Relocate, Exchange, Cross")
+    print("="*80)
+    
+    solver = LocalSearchVRPTWSolver(
+        dataset_path=args.dataset_path,
+        vehicle_capacity=args.capacity,
+        max_vehicles=args.max_vehicles
+    )
+    
+    # Lấy hyperparameters
+    hyperparams = solver.get_recommended_hyperparameters()
+    
+    # Override với tham số CLI
+    if args.max_iter:
+        hyperparams['max_iterations'] = args.max_iter
+    if args.no_improve_limit:
+        hyperparams['no_improve_limit'] = args.no_improve_limit
+    if args.time_limit:
+        hyperparams['time_limit'] = args.time_limit
+    
+    print(f"\nHyperparameters:")
+    print(f"  - Max iterations: {hyperparams.get('max_iterations', 'auto')}")
+    print(f"  - No improve limit: {hyperparams.get('no_improve_limit', 'auto')}")
+    if 'time_limit' in hyperparams:
+        print(f"  - Time limit: {hyperparams['time_limit']}s")
+    print()
+    
+    result = solver.solve(**hyperparams)
+    
+    if result:
+        if not args.no_save:
+            solver.visualize_solution(save=True)
+            solver.save_solution(
+                solve_time=result['time'],
+                status=result['status'],
+                iterations=result['iterations'],
+                improvements=result['improvements']
+            )
+        
+        print(f"\n{'='*80}")
+        print("KẾT QUẢ:")
+        print(f"- Số xe: {len(solver.solution)}")
+        print(f"- Tổng quãng đường: {sum([r['distance'] for r in solver.solution.values()]):.2f} km")
+        print(f"- Thời gian: {result['time']:.2f}s")
+        print(f"- Vòng lặp: {result['iterations']}")
+        print(f"- Số lần cải thiện: {result['improvements']}")
+        print(f"{'='*80}")
+    else:
+        print("\n❌ Không thể tạo solution!")
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main_cli()
+    else:
+        main()

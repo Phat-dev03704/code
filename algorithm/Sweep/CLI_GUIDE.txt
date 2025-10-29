@@ -1,0 +1,74 @@
+===============================================================================
+           SWEEP ALGORITHM - VRPTW SOLVER - CLI GUIDE
+===============================================================================
+
+[1] Chạy 1 dataset (sweep_vrptw_solver.py):
+-------------------------------------------------------------------------------
+# Cơ bản
+python sweep_vrptw_solver.py ../../dataset/C1/C101.csv
+
+# Tùy chỉnh capacity và số xe
+python sweep_vrptw_solver.py ../../dataset/R1/R101.csv --capacity 250 --max-vehicles 30
+
+# Tùy chỉnh góc khởi đầu quét
+python sweep_vrptw_solver.py ../../dataset/RC1/RC101.csv --start-angle 90
+
+# Không lưu kết quả
+python sweep_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+
+
+[2] Test nhiều datasets (test_all_datasets.py):
+-------------------------------------------------------------------------------
+# Test tất cả 56 datasets
+python test_all_datasets.py
+
+# Test category C1 (9 datasets)
+python test_all_datasets.py --category C1
+
+# Test 5 datasets đầu tiên
+python test_all_datasets.py --limit 5
+
+# Test R1 với góc quét tùy chỉnh
+python test_all_datasets.py --category R1 --start-angle 45
+
+
+[3] Parameters:
+-------------------------------------------------------------------------------
+--capacity INT           : Sức chứa xe (mặc định: 200)
+--max-vehicles INT       : Số xe tối đa (mặc định: 25)
+
+Sweep Algorithm Parameters:
+--start-angle FLOAT      : Góc khởi đầu quét theo độ (0-360, mặc định: 0)
+                           Thuật toán quét từ góc này theo chiều kim đồng hồ
+
+--category C1|C2|R1|R2|RC1|RC2  : Chỉ test category này (test_all_datasets.py)
+--limit INT              : Giới hạn số dataset test (test_all_datasets.py)
+--no-save                : Không lưu kết quả (sweep_vrptw_solver.py)
+
+
+[4] Sweep Algorithm - Ưu/Nhược điểm:
+-------------------------------------------------------------------------------
+✅ Ưu điểm:
+  - Rất nhanh, deterministic (không random)
+  - Đơn giản, dễ hiểu và implement
+  - Phù hợp với customers phân bố theo cụm góc
+  - Không cần tuning hyperparameters
+
+❌ Nhược điểm:
+  - Kém hiệu quả với customers phân bố ngẫu nhiên
+  - Phụ thuộc nhiều vào góc khởi đầu
+  - Không tối ưu cho trường hợp có time windows chặt
+  - Chất lượng solution thường kém hơn metaheuristics
+
+
+[5] Kết quả:
+-------------------------------------------------------------------------------
+result/
+├── images/            # Hình ảnh routes
+│   └── [dataset]_sweep_solution.png
+└── text/              # Kết quả text
+    └── [dataset]_sweep_solution.txt
+
+result/test_summary.csv   # Tổng hợp kết quả test (nếu chạy test_all_datasets.py)
+
+===============================================================================

@@ -13,6 +13,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import random
 from copy import deepcopy
+import argparse
+import sys
 
 class ParticleSwarmVRPTWSolver:
     """
@@ -531,5 +533,127 @@ def main():
         )
         print("✓ Hoàn thành!")
 
+
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Particle Swarm Optimization VRPTW Solver',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Cơ bản
+  python pso_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Tùy chỉnh tham số PSO
+  python pso_vrptw_solver.py ../../dataset/R1/R101.csv --n-particles 50 --max-iter 200
+  
+  # Tùy chỉnh hệ số PSO
+  python pso_vrptw_solver.py ../../dataset/RC1/RC101.csv --w 0.7 --c1 1.5 --c2 1.5
+  
+  # Không lưu kết quả
+  python pso_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+        """
+    )
+    
+    parser.add_argument('dataset_path', type=str,
+                        help='Đường dẫn file dataset (.csv)')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--n-particles', type=int,
+                        help='Số particles trong swarm (mặc định: tự động)')
+    
+    parser.add_argument('--max-iter', type=int,
+                        help='Số iterations tối đa (mặc định: tự động)')
+    
+    parser.add_argument('--w', type=float, default=0.7,
+                        help='Inertia weight (mặc định: 0.7)')
+    
+    parser.add_argument('--c1', type=float, default=1.5,
+                        help='Cognitive coefficient (mặc định: 1.5)')
+    
+    parser.add_argument('--c2', type=float, default=1.5,
+                        help='Social coefficient (mặc định: 1.5)')
+    
+    parser.add_argument('--time-limit', type=int,
+                        help='Giới hạn thời gian (giây)')
+    
+    parser.add_argument('--no-save', action='store_true',
+                        help='Không lưu kết quả')
+    
+    return parser.parse_args()
+
+
+def main_cli():
+    """Main CLI function"""
+    args = parse_arguments()
+    
+    print("="*80)
+    print("PARTICLE SWARM OPTIMIZATION - VRPTW SOLVER")
+    print("="*80)
+    print(f"Dataset: {Path(args.dataset_path).stem}")
+    print("🐦 Swarm Intelligence Metaheuristic")
+    print("="*80)
+    
+    solver = ParticleSwarmVRPTWSolver(
+        dataset_path=args.dataset_path,
+        vehicle_capacity=args.capacity,
+        max_vehicles=args.max_vehicles
+    )
+    
+    # Lấy hyperparameters
+    hyperparams = solver.get_recommended_hyperparameters()
+    
+    # Override với tham số CLI
+    if args.n_particles:
+        hyperparams['n_particles'] = args.n_particles
+    if args.max_iter:
+        hyperparams['max_iterations'] = args.max_iter
+    if args.time_limit:
+        hyperparams['time_limit'] = args.time_limit
+    
+    hyperparams['w'] = args.w
+    hyperparams['c1'] = args.c1
+    hyperparams['c2'] = args.c2
+    
+    print(f"\nHyperparameters:")
+    print(f"  - Particles: {hyperparams.get('n_particles', 'auto')}")
+    print(f"  - Max iterations: {hyperparams.get('max_iterations', 'auto')}")
+    print(f"  - Inertia weight (w): {hyperparams['w']}")
+    print(f"  - Cognitive (c1): {hyperparams['c1']}")
+    print(f"  - Social (c2): {hyperparams['c2']}")
+    if 'time_limit' in hyperparams:
+        print(f"  - Time limit: {hyperparams['time_limit']}s")
+    print()
+    
+    result = solver.solve(**hyperparams)
+    
+    if result:
+        if not args.no_save:
+            solver.visualize_solution(save=True)
+            solver.save_solution(
+                solve_time=result['time'],
+                status=result['status'],
+                iterations=result['iterations']
+            )
+        
+        print(f"\n{'='*80}")
+        print("KẾT QUẢ:")
+        print(f"- Số xe: {len(solver.solution)}")
+        print(f"- Tổng quãng đường: {sum([r['distance'] for r in solver.solution.values()]):.2f} km")
+        print(f"- Thời gian: {result['time']:.2f}s")
+        print(f"- Iterations: {result['iterations']}")
+        print(f"{'='*80}")
+    else:
+        print("\n❌ Không thể tạo solution!")
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main_cli()
+    else:
+        main()

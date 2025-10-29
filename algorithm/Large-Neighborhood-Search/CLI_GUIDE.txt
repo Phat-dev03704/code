@@ -1,0 +1,52 @@
+═══════════════════════════════════════════════════════════
+  HƯỚNG DẪN GIAO DIỆN DÒNG LỆNH - LARGE NEIGHBORHOOD SEARCH
+═══════════════════════════════════════════════════════════
+
+[1] LNS_VRPTW_SOLVER.PY - Giải một dataset
+-----------------------------------------------------------
+Cú pháp:
+  python lns_vrptw_solver.py <dataset_path> [options]
+
+Ví dụ:
+  # Cơ bản
+  python lns_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Tùy chỉnh tham số LNS
+  python lns_vrptw_solver.py ../../dataset/R1/R101.csv --max-iter 200 --destroy-rate 0.3
+  
+  # Tùy chỉnh xe
+  python lns_vrptw_solver.py ../../dataset/RC1/RC101.csv --capacity 250 --max-vehicles 30
+  
+  # Không lưu kết quả
+  python lns_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+
+[2] TEST_ALL_DATASETS.PY - Test nhiều datasets
+-----------------------------------------------------------
+Cú pháp:
+  python test_all_datasets.py [options]
+
+Ví dụ:
+  # Test tất cả 56 datasets
+  python test_all_datasets.py
+  
+  # Test chỉ category C1
+  python test_all_datasets.py --category C1
+  
+  # Test 5 datasets đầu
+  python test_all_datasets.py --limit 5
+  
+  # Tùy chỉnh tham số LNS
+  python test_all_datasets.py --category R1 --max-iter 150 --time-limit 120
+
+[3] THAM SỐ CHI TIẾT
+-----------------------------------------------------------
+--max-iter N         Số iterations tối đa (mặc định: tự động)
+--destroy-rate R     Tỷ lệ phá hủy 0-1 (mặc định: tự động)
+--time-limit T       Giới hạn thời gian giây (mặc định: không giới hạn)
+--capacity N         Sức chứa xe (mặc định: 200)
+--max-vehicles N     Số xe tối đa (mặc định: 25)
+--category C1 C2     Chỉ test các category cụ thể
+--limit N            Giới hạn số lượng datasets
+--no-save            Không lưu kết quả
+
+KẾT QUẢ: result/images/, result/text/, result/test_summary.csv

@@ -1,0 +1,51 @@
+═══════════════════════════════════════════════════════════
+        HƯỚNG DẪN GIAO DIỆN DÒNG LỆNH - GENETIC ALGORITHM
+═══════════════════════════════════════════════════════════
+
+[1] GA_VRPTW_SOLVER.PY - Giải một dataset
+-----------------------------------------------------------
+Cú pháp:
+  python ga_vrptw_solver.py <dataset_path> [options]
+
+Ví dụ:
+  # Cơ bản
+  python ga_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Tùy chỉnh tham số GA
+  python ga_vrptw_solver.py ../../dataset/C1/C101.csv --pop-size 150 --generations 500
+  
+  # Tùy chỉnh toán tử GA
+  python ga_vrptw_solver.py ../../dataset/R1/R101.csv --crossover-rate 0.9 --mutation-rate 0.15
+  
+  # Không lưu kết quả
+  python ga_vrptw_solver.py ../../dataset/RC1/RC101.csv --no-save
+
+[2] TEST_ALL_DATASETS.PY - Test nhiều datasets
+-----------------------------------------------------------
+Cú pháp:
+  python test_all_datasets.py [options]
+
+Ví dụ:
+  # Test tất cả
+  python test_all_datasets.py
+  
+  # Test category C1
+  python test_all_datasets.py --category C1
+  
+  # Test 5 datasets đầu
+  python test_all_datasets.py --limit 5
+  
+  # Tùy chỉnh tham số GA
+  python test_all_datasets.py --category R1 --pop-size 100 --time-limit 120
+
+[3] THAM SỐ CHI TIẾT
+-----------------------------------------------------------
+--pop-size N          Kích thước quần thể (mặc định: tự động)
+--generations N       Số thế hệ tối đa (mặc định: 1000)
+--crossover-rate R    Tỷ lệ lai ghép 0-1 (mặc định: 0.8)
+--mutation-rate R     Tỷ lệ đột biến 0-1 (mặc định: 0.1)
+--elite-size N        Số cá thể ưu tú (mặc định: 2)
+--time-limit T        Giới hạn thời gian giây (mặc định: 60)
+--no-save            Không lưu kết quả
+
+KẾT QUẢ: result/images/, result/text/, result/test_summary.csv

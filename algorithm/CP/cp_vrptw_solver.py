@@ -12,6 +12,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
+import argparse
+import sys
 
 
 class CPVRPTWSolver:
@@ -616,5 +618,100 @@ def main():
     print("="*80)
 
 
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+        description='Giải VRPTW bằng Constraint Programming (OR-Tools)',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ví dụ sử dụng:
+  # Giải dataset với thời gian mặc định
+  python cp_vrptw_solver.py ../../dataset/C1/C101.csv
+  
+  # Tăng thời gian giới hạn
+  python cp_vrptw_solver.py ../../dataset/C1/C101.csv --time-limit 300
+  
+  # Tùy chỉnh tham số
+  python cp_vrptw_solver.py ../../dataset/R1/R101.csv --capacity 250 --time-limit 120
+  
+  # Không lưu file
+  python cp_vrptw_solver.py ../../dataset/C1/C101.csv --no-save
+        """
+    )
+    
+    parser.add_argument('dataset_path', type=str, nargs='?',
+                        help='Đường dẫn đến file CSV dataset')
+    
+    parser.add_argument('--capacity', type=int, default=200,
+                        help='Sức chứa của xe (mặc định: 200)')
+    
+    parser.add_argument('--max-vehicles', type=int, default=25,
+                        help='Số xe tối đa (mặc định: 25)')
+    
+    parser.add_argument('--time-limit', type=int, default=60,
+                        help='Giới hạn thời gian giây (mặc định: 60)')
+    
+    parser.add_argument('--no-save', action='store_true',
+                        help='Không lưu kết quả và hình ảnh')
+    
+    return parser.parse_args()
+
+
+def main_cli():
+    """Hàm chính với CLI"""
+    args = parse_arguments()
+    
+    if not args.dataset_path:
+        print("❌ Lỗi: Cần chỉ định đường dẫn dataset")
+        print("Sử dụng: python cp_vrptw_solver.py <dataset_path>")
+        sys.exit(1)
+    
+    dataset_path = Path(args.dataset_path)
+    if not dataset_path.exists():
+        print(f"❌ Lỗi: File không tồn tại: {args.dataset_path}")
+        sys.exit(1)
+    
+    print("="*80)
+    print("CP SOLVER FOR VRPTW - Constraint Programming")
+    print("="*80)
+    print("✓ CP có thể giải toàn bộ dataset (100+ khách hàng)")
+    print("✓ Sử dụng Google OR-Tools")
+    print("="*80)
+    
+    try:
+        # Tạo solver
+        solver = CPVRPTWSolver(
+            dataset_path=str(dataset_path),
+            vehicle_capacity=args.capacity,
+            max_vehicles=args.max_vehicles
+        )
+        
+        # Xây dựng model
+        solver.build_model()
+        
+        # Giải bài toán
+        result = solver.solve(time_limit=args.time_limit)
+        
+        if result:
+            if not args.no_save:
+                print("\n" + "="*80)
+                print("TẠO TRỰC QUAN HÓA VÀ BÁO CÁO")
+                print("="*80)
+                solver.visualize_solution(save=True)
+                solver.save_solution(solve_time=result['time'], status=result['status'])
+                print("✓ Đã tạo file PNG và TXT trong thư mục 'result/'")
+            print("\n✓ Hoàn thành!")
+        else:
+            print("\n❌ Không thể tạo solution!")
+            sys.exit(1)
+            
+    except Exception as e:
+        print(f"❌ Lỗi: {str(e)}")
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main_cli()
+    else:
+        main()
