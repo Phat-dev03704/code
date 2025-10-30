@@ -1,6 +1,6 @@
-═══════════════════════════════════════════════════════════
+==================================================================================
    HƯỚNG DẪN GIAO DIỆN DÒNG LỆNH - OR-TOOLS (Google Optimization)
-═══════════════════════════════════════════════════════════
+==================================================================================
 
 OR-TOOLS: Solver optimization mạnh mẽ từ Google, có sẵn Routing solver
 chuyên dụng cho VRP. Thường cho kết quả rất tốt với tốc độ nhanh.
@@ -45,11 +45,11 @@ Ví dụ:
 -----------------------------------------------------------
 --time-limit T       Giới hạn thời gian (giây, mặc định: 60)
 --strategy NAME      Search strategy (mặc định: AUTOMATIC)
-  • AUTOMATIC                  Tự động chọn strategy
-  • PATH_CHEAPEST_ARC         Greedy nearest neighbor
-  • GUIDED_LOCAL_SEARCH       Guided local search (tốt)
-  • SIMULATED_ANNEALING       Simulated annealing
-  • TABU_SEARCH              Tabu search
+  - AUTOMATIC                  Tự động chọn strategy
+  - PATH_CHEAPEST_ARC         Greedy nearest neighbor
+  - GUIDED_LOCAL_SEARCH       Guided local search (tốt)
+  - SIMULATED_ANNEALING       Simulated annealing
+  - TABU_SEARCH              Tabu search
   
 --capacity N         Sức chứa xe (mặc định: 200)
 --max-vehicles N     Số xe tối đa (mặc định: 25)
@@ -57,33 +57,3 @@ Ví dụ:
 --limit N            Giới hạn số lượng datasets
 --no-save            Không lưu kết quả
 
-[4] ƯU NHƯỢC ĐIỂM
------------------------------------------------------------
-✓ Solver mạnh mẽ từ Google
-✓ Chất lượng solution rất tốt
-✓ Tốc độ nhanh (thường < 60s)
-✓ Có sẵn nhiều strategies và options
-✓ Production-ready, đã được optimize kỹ
-✓ Hỗ trợ nhiều constraints phức tạp
-
-✗ Cần cài thêm thư viện ortools
-✗ API phức tạp hơn heuristics đơn giản
-
-[5] SO SÁNH VỚI CÁC PHƯƠNG PHÁP KHÁC
------------------------------------------------------------
-┌─────────────────┬────────────────┬─────────────────────┐
-│ Method          │ Speed          │ Solution Quality    │
-├─────────────────┼────────────────┼─────────────────────┤
-│ OR-Tools        │ Nhanh (< 60s)  │ Xuất sắc ⭐⭐⭐⭐⭐   │
-│ CP (OR-Tools)   │ Chậm           │ Tối ưu (nhỏ)        │
-│ LNS             │ Trung bình     │ Rất tốt             │
-│ Hybrid CW-LNS   │ Nhanh-TB       │ Tốt                 │
-│ Clarke-Wright   │ Rất nhanh      │ Cơ bản              │
-└─────────────────┴────────────────┴─────────────────────┘
-
-KHUYẾN NGHỊ: OR-Tools là lựa chọn tốt nhất cho production nếu không
-            có yêu cầu đặc biệt. Kết hợp tốc độ và chất lượng.
-
-KẾT QUẢ: result/images/, result/text/, result/ortools_summary.csv
-
-📦 Cài đặt: pip install ortools

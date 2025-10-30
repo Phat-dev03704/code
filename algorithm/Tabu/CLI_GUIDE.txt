@@ -50,22 +50,7 @@ Tabu Search Parameters:
 --no-save                : Không lưu kết quả (tabu_vrptw_solver.py)
 
 
-[4] Tabu Search - Ưu/Nhược điểm:
--------------------------------------------------------------------------------
-✅ Ưu điểm:
-  - Tránh lặp lại giải pháp đã thăm nhờ Tabu List (short-term memory)
-  - Có thể thoát khỏi local optima
-  - Hiệu quả cao với neighborhood structure tốt
-  - Kết quả ổn định, ít phụ thuộc random
-
-❌ Nhược điểm:
-  - Cần điều chỉnh tabu_tenure (độ dài Tabu List)
-  - Memory overhead để lưu Tabu List
-  - Thời gian chạy có thể lâu với dataset lớn
-  - Hiệu suất phụ thuộc nhiều vào initial solution
-
-
-[5] Kết quả:
+[4] Kết quả:
 -------------------------------------------------------------------------------
 result/
 ├── images/            # Hình ảnh routes

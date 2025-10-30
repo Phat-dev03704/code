@@ -1,8 +1,8 @@
-═══════════════════════════════════════════════════════════
+==================================================================================
    HƯỚNG DẪN GIAO DIỆN DÒNG LỆNH - MILP (Mixed Integer Linear Programming)
-═══════════════════════════════════════════════════════════
+==================================================================================
 
-⚠️  LƯU Ý: MILP chỉ hiệu quả với datasets nhỏ (<30 khách hàng)
+[!] LƯU Ý: MILP chỉ hiệu quả với datasets nhỏ (<30 khách hàng)
            Với datasets lớn, nên dùng Heuristic/Metaheuristic
 
 [1] MILP_VRPTW_SOLVER.PY - Giải một dataset
@@ -51,11 +51,4 @@ Ví dụ:
 --limit N            Giới hạn số lượng datasets
 --no-save            Không lưu kết quả
 
-[4] ƯU NHƯỢC ĐIỂM
------------------------------------------------------------
-✓ Ưu điểm:    Tìm solution tối ưu chính xác (optimal)
-✓ Ưu điểm:    Đảm bảo toán học chặt chẽ
-✗ Nhược điểm: Chỉ hiệu quả với datasets nhỏ (<30 khách hàng)
-✗ Nhược điểm: Thời gian tính toán tăng cấp số nhân
 
-KẾT QUẢ: result/images/, result/text/, result/test_summary.csv

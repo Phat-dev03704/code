@@ -46,22 +46,7 @@ Sweep Algorithm Parameters:
 --no-save                : Không lưu kết quả (sweep_vrptw_solver.py)
 
 
-[4] Sweep Algorithm - Ưu/Nhược điểm:
--------------------------------------------------------------------------------
-✅ Ưu điểm:
-  - Rất nhanh, deterministic (không random)
-  - Đơn giản, dễ hiểu và implement
-  - Phù hợp với customers phân bố theo cụm góc
-  - Không cần tuning hyperparameters
-
-❌ Nhược điểm:
-  - Kém hiệu quả với customers phân bố ngẫu nhiên
-  - Phụ thuộc nhiều vào góc khởi đầu
-  - Không tối ưu cho trường hợp có time windows chặt
-  - Chất lượng solution thường kém hơn metaheuristics
-
-
-[5] Kết quả:
+[4] Kết quả:
 -------------------------------------------------------------------------------
 result/
 ├── images/            # Hình ảnh routes

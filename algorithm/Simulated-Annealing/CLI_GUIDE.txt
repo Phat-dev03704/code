@@ -50,22 +50,7 @@ Simulated Annealing Parameters:
 --no-save                : Không lưu kết quả (sa_vrptw_solver.py)
 
 
-[4] Simulated Annealing - Ưu/Nhược điểm:
--------------------------------------------------------------------------------
-✅ Ưu điểm:
-  - Tránh được local optima bằng cách chấp nhận giải pháp tệ hơn với xác suất
-  - Xác suất chấp nhận giảm dần theo nhiệt độ → hội tụ dần
-  - Đơn giản, dễ implement
-  - Phù hợp với bài toán có nhiều local optima
-
-❌ Nhược điểm:
-  - Cần điều chỉnh nhiều hyperparameters (initial_temp, cooling_rate)
-  - Thời gian chạy có thể lâu với cooling_rate cao
-  - Hiệu suất phụ thuộc nhiều vào schedule làm lạnh
-  - Không đảm bảo tìm được global optimum
-
-
-[5] Kết quả:
+[4] Kết quả:
 -------------------------------------------------------------------------------
 result/
 ├── images/            # Hình ảnh routes

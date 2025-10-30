@@ -1,6 +1,6 @@
-═══════════════════════════════════════════════════════════
+==================================================================================
    HƯỚNG DẪN - DQN-RL VRPTW SOLVER (Deep Q-Network)
-═══════════════════════════════════════════════════════════
+==================================================================================
 
 DQN-RL: Sử dụng Deep Q-Network Reinforcement Learning để học
 policy giải VRPTW thông qua trial-and-error.
@@ -30,16 +30,3 @@ python test_all_datasets.py
 
 Kết quả: result/training_curves.png
 
-[4] ƯU NHƯỢC ĐIỂM
------------------------------------------------------------
-✓ Học qua trial-and-error
-✓ Không cần supervision
-✓ Inference nhanh
-✗ Training rất lâu (4-8 giờ)
-✗ Chất lượng solution trung bình
-✗ Khó converge
-
-KẾT QUẢ: result/training_curves.png
-MODEL: models/dqn_model_best.pth
-
-📖 Xem thêm: README.md, TRAINING_GUIDE.md

@@ -9,7 +9,7 @@ Các models cần được TRAIN trước khi sử dụng để giải VRPTW.
 [1] ATTENTION MODEL (Transformer-based Reinforcement Learning)
 ═══════════════════════════════════════════════════════════════════════════════
 
-📂 Vị trí: NeuralCombinatorialOptimization/Attention-Model/
+[Vị trí] NeuralCombinatorialOptimization/Attention-Model/
 
 Mô tả: Sử dụng Attention Mechanism (Transformer) kết hợp với RL để học cách giải VRPTW
 
@@ -39,7 +39,7 @@ Model: models/attention_model_best.pth
 [2] DQN-RL (Deep Q-Network Reinforcement Learning)
 ═══════════════════════════════════════════════════════════════════════════════
 
-📂 Vị trí: NeuralCombinatorialOptimization/DQN-RL/
+[Vị trí] NeuralCombinatorialOptimization/DQN-RL/
 
 Mô tả: Sử dụng Deep Q-Network để học policy giải VRPTW thông qua trial-and-error
 
@@ -65,13 +65,13 @@ python test_all_datasets.py
 Kết quả: result/training_curves.png
 Model: models/dqn_model_best.pth
 
-📖 Xem thêm: TRAINING_GUIDE.md
+[Xem thêm] TRAINING_GUIDE.md
 
 ═══════════════════════════════════════════════════════════════════════════════
 [3] POINTER NETWORK (Sequence-to-Sequence with Attention)
 ═══════════════════════════════════════════════════════════════════════════════
 
-📂 Vị trí: NeuralCombinatorialOptimization/Pointer-Network/
+[Vị trí] NeuralCombinatorialOptimization/Pointer-Network/
 
 Mô tả: Sử dụng Pointer Network (Seq2Seq + Attention) để output sequence các điểm
 
@@ -97,47 +97,5 @@ python test_all_datasets.py
 Kết quả: result/images/, result/text/, result/test_summary.csv
 Model: models/pointer_network_best.pth
 
-📖 Xem thêm: TRAINING_GUIDE.md
+[Xem thêm] TRAINING_GUIDE.md
 
-═══════════════════════════════════════════════════════════════════════════════
-[4] SO SÁNH CÁC PHƯƠNG PHÁP ML/DL
-═══════════════════════════════════════════════════════════════════════════════
-
-┌─────────────────┬──────────────────┬────────────────┬─────────────────────┐
-│ Method          │ Training Time    │ Inference Time │ Solution Quality    │
-├─────────────────┼──────────────────┼────────────────┼─────────────────────┤
-│ Attention Model │ 2-4 hours        │ < 1s           │ Tốt                 │
-│ DQN-RL          │ 4-8 hours        │ < 1s           │ Trung bình          │
-│ Pointer Network │ 3-6 hours        │ < 1s           │ Tốt                 │
-└─────────────────┴──────────────────┴────────────────┴─────────────────────┘
-
-ƯU ĐIỂM:
-  ✓ Inference rất nhanh (< 1 giây)
-  ✓ Có thể generalize cho các instances mới
-  ✓ End-to-end learning, không cần thiết kế heuristic
-  ✓ Có thể cải thiện qua training thêm
-
-NHƯỢC ĐIỂM:
-  ✗ Cần thời gian training dài
-  ✗ Cần GPU để training hiệu quả
-  ✗ Chất lượng solution phụ thuộc vào training data
-  ✗ Khó giải thích (black-box)
-
-═══════════════════════════════════════════════════════════════════════════════
-[5] YÊU CẦU HỆ THỐNG
-═══════════════════════════════════════════════════════════════════════════════
-
-Python Packages:
-  - torch (PyTorch)
-  - numpy, pandas
-  - matplotlib
-  
-Hardware (khuyến nghị):
-  - GPU (CUDA) cho training
-  - CPU đủ cho inference
-  - RAM: 8GB+
-
-═══════════════════════════════════════════════════════════════════════════════
-LƯU Ý: Các ML/DL models cần được TRAIN trước khi sử dụng. Thời gian training có
-       thể mất vài giờ. Nếu chưa có model trained, hãy chạy train.py trước.
-═══════════════════════════════════════════════════════════════════════════════

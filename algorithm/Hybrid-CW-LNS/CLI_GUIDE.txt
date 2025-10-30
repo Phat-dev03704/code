@@ -1,6 +1,6 @@
-═══════════════════════════════════════════════════════════
+==================================================================================
    HƯỚNG DẪN GIAO DIỆN DÒNG LỆNH - HYBRID CW-LNS (Simplified)
-═══════════════════════════════════════════════════════════
+==================================================================================
 
 [1] SIMPLIFIED_HYBRID_VRPTW_SOLVER.PY - Giải một dataset
 -----------------------------------------------------------
@@ -8,7 +8,7 @@ Cú pháp:
   python simplified_hybrid_vrptw_solver.py <dataset_path> [options]
 
 Ví dụ:
-  # Chạy với mode balanced (khuyến nghị ⭐)
+  # Chạy với mode balanced (khuyến nghị)
   python simplified_hybrid_vrptw_solver.py ../../dataset/C1/C101.csv
   
   # Chạy với mode nhanh
@@ -48,7 +48,7 @@ Ví dụ:
 -----------------------------------------------------------
 --mode cw_only        Chỉ Clarke-Wright (< 1s, chất lượng cơ bản)
 --mode fast           Cải thiện nhanh (10-15s, cân bằng tốt)
---mode balanced       Cân bằng tối ưu (20-25s) ⭐ KHUYẾN NGHỊ
+--mode balanced       Cân bằng tối ưu (20-25s) - KHUYẾN NGHỊ
 --mode quality        Chất lượng cao (40-50s, tốt nhất)
 
 [4] THAM SỐ KHÁC

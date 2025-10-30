@@ -1,6 +1,6 @@
-═══════════════════════════════════════════════════════════
+==================================================================================
    HƯỚNG DẪN GIAO DIỆN DÒNG LỆNH - PARTICLE SWARM OPTIMIZATION
-═══════════════════════════════════════════════════════════
+==================================================================================
 
 PARTICLE SWARM OPTIMIZATION (PSO): Thuật toán metaheuristic mô phỏng
 hành vi tối ưu của bầy đàn (swarm intelligence). Particles di chuyển
@@ -59,31 +59,15 @@ Ví dụ:
 [4] GIẢI THÍCH HỆ SỐ PSO
 -----------------------------------------------------------
 w (Inertia Weight):   Trọng số quán tính
-                      • Cao (0.9): Khám phá rộng (exploration)
-                      • Thấp (0.4): Khai thác sâu (exploitation)
-                      • Khuyến nghị: 0.7
+                      - Cao (0.9): Khám phá rộng (exploration)
+                      - Thấp (0.4): Khai thác sâu (exploitation)
+                      - Khuyến nghị: 0.7
 
 c1 (Cognitive):       Hệ số nhận thức cá nhân
-                      • Cao: Particles tin vào kinh nghiệm bản thân
-                      • Khuyến nghị: 1.5
+                      - Cao: Particles tin vào kinh nghiệm bản thân
+                      - Khuyến nghị: 1.5
 
 c2 (Social):          Hệ số xã hội toàn cục
-                      • Cao: Particles theo best của swarm
-                      • Khuyến nghị: 1.5
+                      - Cao: Particles theo best của swarm
+                      - Khuyến nghị: 1.5
 
-[5] ƯU NHƯỢC ĐIỂM
------------------------------------------------------------
-✓ Swarm intelligence - mô phỏng tự nhiên
-✓ Đơn giản, dễ implement
-✓ Ít tham số cần điều chỉnh
-✓ Tốt cho continuous optimization
-✓ Tránh local optima tốt
-
-✗ Cần nhiều particles (chậm)
-✗ Khó áp dụng cho discrete problems như VRP
-✗ Hiệu suất phụ thuộc nhiều vào tham số
-✗ Có thể converge sớm
-
-KẾT QUẢ: result/images/, result/text/, result/test_summary.csv
-
-🐦 PSO phù hợp cho: Bài toán cần explore rộng, tránh local optima

@@ -2,7 +2,7 @@
                HƯỚNG DẪN CLI - CLARKE-WRIGHT SAVINGS ALGORITHM
 ==================================================================================
 
-📌 1. GIẢI 1 DATASET (cw_vrptw_solver.py)
+[1] GIẢI 1 DATASET (cw_vrptw_solver.py)
 ----------------------------------------------------------------------------------
 Cú pháp:  python cw_vrptw_solver.py <file_dataset> [options]
 
@@ -17,7 +17,7 @@ Tham số:
   --no-save              Không lưu kết quả
 
 
-📌 2. TEST NHIỀU DATASETS (test_all_datasets.py)
+[2] TEST NHIỀU DATASETS (test_all_datasets.py)
 ----------------------------------------------------------------------------------
 Cú pháp:  python test_all_datasets.py [options]
 
@@ -35,9 +35,9 @@ Tham số:
   --max-vehicles     Số xe tối đa (mặc định: 25)
 
 
-📂 KẾT QUẢ:
-  result/images/           ← Hình ảnh (.png)
-  result/text/             ← Báo cáo (.txt)
-  result/test_summary.csv  ← Tổng kết
+[3] KẾT QUẢ:
+  result/images/            Hình ảnh (.png)
+  result/text/              Báo cáo (.txt)
+  result/test_summary.csv   Tổng kết
 
 ==================================================================================

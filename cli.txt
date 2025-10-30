@@ -2,7 +2,7 @@
                     HƯỚNG DẪN SỬ DỤNG - VRPTW VISUALIZATION
 ==================================================================================
 
-� 1. TRỰC QUAN HÓA 1 DATASET (visualize_vrptw.py)
+[1] TRỰC QUAN HÓA 1 DATASET (visualize_vrptw.py)
 ----------------------------------------------------------------------------------
 Cú pháp:  python visualize_vrptw.py <file_dataset> [options]
 
@@ -19,7 +19,7 @@ Tùy chọn nâng cao:
   --help                   # Xem tất cả tùy chọn
 
 
-📌 2. TRỰC QUAN HÓA HÀNG LOẠT (visualize_all_datasets.py)
+[2] TRỰC QUAN HÓA HÀNG LOẠT (visualize_all_datasets.py)
 ----------------------------------------------------------------------------------
 Cú pháp:  python visualize_all_datasets.py [options]
 
@@ -35,8 +35,8 @@ Tùy chọn nâng cao:
   --help                   # Xem tất cả tùy chọn
 
 
-📂 OUTPUT:
-  visualize dataset images/  ← Tất cả hình ảnh (.png)
-  visulize dataset txt/      ← Tất cả báo cáo (.txt)
+[3] OUTPUT:
+  visualize dataset images/   Tất cả hình ảnh (.png)
+  visulize dataset txt/       Tất cả báo cáo (.txt)
 
 ==================================================================================

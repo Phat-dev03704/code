@@ -1,6 +1,6 @@
-═══════════════════════════════════════════════════════════
+==================================================================================
    HƯỚNG DẪN - ATTENTION MODEL VRPTW SOLVER (Deep RL)
-═══════════════════════════════════════════════════════════
+==================================================================================
 
 ATTENTION MODEL: Sử dụng Transformer-based Reinforcement Learning
 để học cách giải VRPTW. Model cần được TRAIN trước khi sử dụng.
@@ -55,13 +55,13 @@ Kết quả: result/test_summary.csv, result/test_report.txt
 
 [5] ƯU NHƯỢC ĐIỂM
 -----------------------------------------------------------
-✓ Inference rất nhanh (< 1s)
-✓ End-to-end learning
-✓ Có thể generalize cho instances mới
-✗ Cần training dài (2-4 giờ)
-✗ Cần GPU để training hiệu quả
+(+) Inference rất nhanh (< 1s)
+(+) End-to-end learning
+(+) Có thể generalize cho instances mới
+(-) Cần training dài (2-4 giờ)
+(-) Cần GPU để training hiệu quả
 
 KẾT QUẢ: result/images/, result/text/, result/test_summary.csv
 MODEL: models/attention_model_best.pth
 
-📖 Xem thêm: README.md
+[Xem thêm] README.md
