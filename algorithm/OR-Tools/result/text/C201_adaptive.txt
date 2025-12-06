@@ -1,0 +1,23 @@
+ADAPTIVE OR-TOOLS SOLVER RESULT
+Dataset: C201.csv
+Status: Optimal/Success
+Vehicles: 10
+Total Distance: 944.40
+Best Known Solution: 591.56
+Gap: +59.65%
+Customers Served: 100
+Solve Time: 60.01s
+Strategy: PARALLEL_CHEAPEST_INSERTION
+Metaheuristic: GUIDED_LOCAL_SEARCH
+
+Routes:
+Vehicle 1: [67, 63, 62, 74, 72, 61, 64, 66]
+Vehicle 2: [18, 19, 16, 14, 12, 15, 17, 13, 9]
+Vehicle 3: [75, 7, 3, 4, 91, 88, 84, 83, 82, 87, 90]
+Vehicle 4: [20, 22, 24, 27, 30, 29, 34, 28, 26, 23, 25, 11, 10]
+Vehicle 5: [93, 8, 21]
+Vehicle 6: [6, 32, 33, 31, 35, 37, 38, 39, 36]
+Vehicle 7: [5, 2, 1, 99, 100, 97, 92, 94, 95, 98, 89]
+Vehicle 8: [68, 65, 57, 40, 46, 45, 51, 50, 52, 47, 43, 42, 48]
+Vehicle 9: [86, 85, 76, 71, 70, 73, 80, 79, 81, 78, 77, 96]
+Vehicle 10: [69, 49, 55, 54, 53, 56, 58, 60, 59, 44, 41]

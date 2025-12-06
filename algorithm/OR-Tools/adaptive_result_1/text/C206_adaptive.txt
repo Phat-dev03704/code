@@ -1,0 +1,23 @@
+ADAPTIVE OR-TOOLS SOLVER RESULT
+Dataset: C206.csv
+Status: Feasible (Local optimum not reached)
+Vehicles Used: 10
+Total Distance: 1079.30
+Best Known Solution: 588.49
+Gap: +83.40%
+Customers Served: 100
+Solve Time: 60.04s
+Strategy: PARALLEL_CHEAPEST_INSERTION
+Metaheuristic: GUIDED_LOCAL_SEARCH
+
+Routes:
+Vehicle 1: [22, 21]
+Vehicle 2: [37, 38, 35, 31, 60, 58, 53, 56, 59, 41]
+Vehicle 3: [69, 66, 65, 49, 55, 54, 57, 40, 44, 46, 42]
+Vehicle 4: [7, 3, 95, 98, 12, 19, 16, 14, 15]
+Vehicle 5: [6, 32, 33, 34, 36, 39, 28, 26, 23, 18]
+Vehicle 6: [89, 4, 91, 88, 86, 84, 83, 82, 85, 71, 76, 77, 96]
+Vehicle 7: [63, 80, 70, 73, 79, 81, 78, 87, 90]
+Vehicle 8: [20, 24, 27, 29, 30, 25, 17, 13, 9, 11, 10, 8]
+Vehicle 9: [67, 62, 74, 72, 61, 64, 68, 45, 51, 50, 52, 47, 43, 48]
+Vehicle 10: [93, 5, 75, 2, 1, 99, 100, 97, 92, 94]
