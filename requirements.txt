@@ -1,0 +1,18 @@
+# Core Data Science Libraries
+pandas
+numpy
+scipy
+
+# Visualization
+matplotlib
+seaborn
+
+# Optimization
+ortools
+
+# Deep Learning (for ML algorithms)
+torch
+tqdm
+
+# Utilities
+pathlib2
